@@ -1,0 +1,126 @@
+<template>
+  <div class="mod-albums">
+    <div class="hd log url">
+      <h2>新歌速递</h2>
+      <div>
+        更多
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="gallery">
+        <div class="scroller">
+          <div class="card url" v-for="(item,index) in NewsMusic.slice(0,3)" :key="index">
+            <div class="album">
+              <img :src="item.picUrl" alt="item.name">
+              <div class="name">{{item.name}}</div>
+              <div class="author">{{item.artist.name}}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</template>
+
+<script>
+  import axios from '@/plugins/axios.js'
+
+  export default {
+    name: "NewsMusic",
+    data(){
+      return{
+        NewsMusic: []
+      }
+    },
+    mounted(){
+      const url = "/album/newest";
+      axios.get(url).then(res=>{
+        // console.log(res.data.albums)
+        this.NewsMusic = res.data.albums
+      },2000).catch(error =>{
+        console.log(error)
+      })
+
+    },
+    methods:{
+      // getWangyi(){
+      //   axios({
+      //     url: '/playlist/hot',  /*热门歌单接口地址*/
+      //     method: 'post'
+      //   })
+      //     .then(res => {
+      //       console.log("我拿到的数据：", res.data.tags)
+      //     })
+      //     .catch(err => {
+      //       console.log(err)
+      //     })
+      // }
+    }
+  }
+</script>
+
+<style scoped>
+
+  .mod-albums{
+    background-color: #fff;
+    padding: 10px 17px;
+    margin-top: 10px;
+  }
+  .hd{
+    display: flex;
+    margin: 14px 0 18px 0;
+  }
+  .hd h2{
+    -webkit-box-flex: 1;
+    -webkit-flex: 1;
+    flex: 1;
+    margin: 0;
+    padding: 0;
+    font-size: 20px;
+  }
+  .hd div{
+    width: 64px;
+    font-size: 12px;
+    text-align: right;
+  }
+  .mod-albums .gallery{
+    overflow: hidden;
+    margin: 0 -5px;
+  }
+  .mod-albums .gallery .card{
+    width: 33.3%;
+    float: left;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    padding: 0 5px 10px;
+  }
+  .mod-albums .gallery .card .album{
+    position: relative;
+  }
+  .mod-albums .gallery .card img{
+    width: 100%;
+    height: auto;
+    border: 1px solid #eee;
+  }
+  .mod-albums .gallery .card .name{
+    font-size: 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-top: 4px;
+    line-height: 14px;
+    max-height: 28px;
+    margin-bottom: 2px;
+  }
+  .mod-albums .gallery .card .author{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #999;
+    font-size: 12px;
+    line-height: 12px;
+  }
+
+</style>
