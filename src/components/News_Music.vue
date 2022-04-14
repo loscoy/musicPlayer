@@ -2,20 +2,24 @@
   <div class="mod-albums">
     <div class="hd log url">
       <h2>新歌速递</h2>
-      <div>
-        更多
-      </div>
+      <router-link :to="{name:'moreList',query:{title:'新歌速递',url:'/album/newest'}}" v-slot="{navigate}">
+        <div @click="navigate" role="link">
+          更多
+        </div>
+      </router-link>
     </div>
 
     <div class="container">
       <div class="gallery">
         <div class="scroller">
           <div class="card url" v-for="(item,index) in NewsMusic.slice(0,3)" :key="index">
-            <div class="album">
-              <img :src="item.picUrl" alt="item.name">
-              <div class="name">{{item.name}}</div>
-              <div class="author">{{item.artist.name}}</div>
-            </div>
+            <router-link :to="{name:'musicPlay2',query: {musicId:item.id,musicName:item.name,musicArtist:item.artist.name,musicPic:item.picUrl}}" custom v-slot="{navigate}">
+              <div class="album" @click="navigate" role="link">
+                <img :src="item.picUrl" alt="item.name">
+                <div class="name">{{item.name}}</div>
+                <div class="author">{{item.artist.name}}</div>
+              </div>
+            </router-link>
           </div>
         </div>
       </div>
@@ -25,7 +29,7 @@
 </template>
 
 <script>
-  import axios from '@/plugins/axios.js'
+  import axios from '../plugins/axios.js'
 
   export default {
     name: "NewsMusic",
@@ -37,7 +41,7 @@
     mounted(){
       const url = "/album/newest";
       axios.get(url).then(res=>{
-        // console.log(res.data.albums)
+        console.log('new',res.data.albums)
         this.NewsMusic = res.data.albums
       },2000).catch(error =>{
         console.log(error)
@@ -103,6 +107,7 @@
     width: 100%;
     height: auto;
     border: 1px solid #eee;
+    border-radius: 15px;
   }
   .mod-albums .gallery .card .name{
     font-size: 12px;

@@ -1,59 +1,95 @@
 <template>
-  <div class="mod-albums">
+  <div class="mod-albums" v-if="this.url === '/personalized/newsong'">
     <div class="hd log url">
-      <h2>今日推荐</h2>
-      <div>更多</div>
+      <h2>{{title}}</h2>
+      <router-link :to="{ name:'moreList', query:{ url:url,title:title}}" custom v-slot="{ navigate }">
+        <div @click="navigate" role="link">更多</div>
+      </router-link>
     </div>
-
     <div class="container">
       <div class="gallery">
         <div class="scroller">
-          <div class="card url" v-for="(item,index) in todayRecommend.slice(0, 6)" :key="index">
-            <div class="album">
-              <img :src="item.picUrl" alt="item.name">
-              <div class="name">{{item.name}}</div>
+            <div class="card url" v-for="(item,index) in todayRecommend.slice(0, 6)" :key="index">
+              <router-link :to="{name:'musicPlay2',query:{musicId:item.id,musicName:item.name,musicArtist:item.song.artists[0].name,musicPic:item.picUrl}}" custom v-slot="{navigate}">
+                <div class="album" @click="navigate" @keypress.enter="navigate" role="link">
+                  <img :src="item.picUrl" :alt="item.name">
+                  <div class="name">{{item.name}}</div>
+                </div>
+              </router-link>
             </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mod-albums" v-else-if="this.url === '/artists?id=6452'">
+    <div class="hd log url" >
+      <h2>{{title}}</h2>
+      <router-link :to="{name:'moreList',query:{url:url,title:title}}" custom v-slot="{ navigate }">
+        <div @click="navigate" role="link">更多</div>
+      </router-link>
+    </div>
+    <div class="container">
+      <div class="gallery">
+        <div class="scroller">
+          <!-- 如何只显示六个？？-->
+          <div class="card url" v-for="(item,index) in todayRecommend" v-if="item.al.picUrl !== null && index <= 6" :key="index">
+            <router-link :to="{name:'musicPlay2',query:{musicId:item.id, musicName:item.name, musicArtist:item.ar[1].name + '/' + item.ar[0].name,musicPic:item.al.picUrl}}" custom v-slot="{navigate}">
+              <div class="album" @click="navigate" @keypress.enter="navigate" role="link">
+                <img :src="item.al.picUrl" :alt="item.name">
+                <div class="name">{{item.name}}</div>
+              </div>
+            </router-link>
           </div>
         </div>
       </div>
     </div>
-
   </div>
 </template>
 
 <script>
-  import axios from '@/plugins/axios.js'
+  import axios from '../plugins/axios.js'
 
   export default {
     name: "TodayRecommend",
     data(){
       return{
-        todayRecommend: []
+        todayRecommend: [],
+      }
+    },
+    props:{
+      title:{
+        type:String,
+        default:"今日推荐"
+      },
+      url:{
+        type:String,
+        default: "/personalized/newsong"
       }
     },
     mounted(){
-      var url = "/personalized/newsong"
-      this.$axios.get(url).then(res=>{
-        // console.log(res.data.result)
-        this.todayRecommend = res.data.result
-      },2000).catch(error =>{
-        console.log(error)
-      })
+      if(this.url === "/personalized/newsong"){
+        axios.get(this.url).then(res=>{
+          // console.log(res.data)
+          this.todayRecommend = res.data.result
+        },2000).catch(error =>{
+          console.log(error)
+        })
+      }
+      if (this.url === "/artists?id=6452"){
+        axios.get(this.url).then(res=>{
+          this.todayRecommend = res.data.hotSongs
+          // console.log(res.data.hotSongs[0].ar[1].name)
+        },2000).catch(error =>{
+          console.log(error)
+        })
+      }
+    },
+    computed: {
 
     },
     methods:{
-      // getWangyi(){
-      //   axios({
-      //     url: '/playlist/hot',  /*热门歌单接口地址*/
-      //     method: 'post'
-      //   })
-      //     .then(res => {
-      //       console.log("数据：", res.data.tags)
-      //     })
-      //     .catch(err => {
-      //       console.log(err)
-      //     })
-      // }
+
     }
   }
 </script>
@@ -97,8 +133,9 @@
   }
   .mod-albums .gallery .card img{
     width: 100%;
-    height: auto;
+    height: 107px;
     border: 1px solid #eee;
+    border-radius: 15px;
   }
   .mod-albums .gallery .card .name{
     font-size: 12px;

@@ -105,7 +105,7 @@ export default {
     color: #222;
     text-decoration: none;
   }
-  .active{
-    color: #222 !important;
+  .router-link-active{
+    color: red !important;
   }
 </style>

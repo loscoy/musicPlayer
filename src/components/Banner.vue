@@ -3,7 +3,7 @@
   <swiper class="banner" :options="swiperOption" v-if="banner.length" ref="mySwiper">
     <!--    v-if控制循环-->
     <swiper-slide v-for="(item, index) in banner" :key="index">
-        <img :src="item.imageUrl" alt="item.encodeId"/>
+        <img :src="item.pic" alt="item.encodeId"/>
     </swiper-slide>
     <div class="swiper-pagination" slot="pagination"></div>
   </swiper>
@@ -41,7 +41,7 @@
       }
     },
     mounted(){
-      const url = "/banner";
+      const url = "/banner?type=1";
       axios.get(url).then(res=>{
         // console.log(res.data.banners)
         this.banner = res.data.banners
@@ -58,7 +58,7 @@
 <style scoped>
 
   .banner{
-    padding: 10px;
+    /*padding: 10px;*/
   }
 
 </style>

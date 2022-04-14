@@ -4,42 +4,50 @@
       <ul class="list">
 
         <div v-if="url==='/album/list?limit=6'" v-for="(item,index) in currentData" :key="index">
-          <li class="song url">
-            {{index+1}}
-              <div class="poster">
-                <img :src="item.coverUrl" :alt="item.albumName">
-              </div>
-              <div class="info">
-                <div class="name">
-                  {{item.albumName}}
-                </div>
-                <div class="author">
-                  {{item.artistName}}
-                </div>
-              </div>
-          </li>
+          <router-link to="/musicplay2" custom v-slot="{navigate}">
+            <div @click="navigate" role="link">
+              <li  class="song url">
+                <span class="range">{{index+1}}</span>
+                  <div class="poster">
+                    <img :src="item.coverUrl" :alt="item.albumName">
+                  </div>
+                  <div class="info">
+                    <div class="name">
+                      {{item.albumName}}
+                    </div>
+                    <div class="author">
+                      {{item.artistName}}
+                    </div>
+                  </div>
+              </li>
+            </div>
+          </router-link>
         </div>
 
-        <div v-if="url==='/album/newest'">
-          <li class="song url" v-for="(item,index) in currentData" :key="index">
-            {{index+1}}
-            <div class="poster">
-              <img :src="item.picUrl" alt="picId">
+        <div v-if="url==='/album/newest'"  v-for="(item,index) in currentData.slice(0,6)" :key="index">
+          <router-link :to="{name:'musicPlay2',query:{musicId:item.id,musicName:item.name,musicArtist:item.artists.name,musicPic:item.picUrl}}" custom v-slot="{navigate}">
+            <div @click="navigate" role="link">
+              <li class="song url">
+                <span class="range">{{index+1}}</span>
+                <div class="poster">
+                  <img :src="item.picUrl" alt="picId">
+                </div>
+                <div class="info">
+                  <div class="name">
+                    {{item.name}}
+                  </div>
+                  <div class="author">
+                    {{item.artist.name}}
+                  </div>
+                </div>
+              </li>
             </div>
-            <div class="info">
-              <div class="name">
-                {{item.name}}
-              </div>
-              <div class="author">
-                {{item.artist.name}}
-              </div>
-            </div>
-          </li>
+          </router-link>
         </div>
 
         <div v-if="url==='/top/artists?offset=0&limit=30'">
-          <li class="song url" v-for="(item,index) in currentData" :key="index">
-            {{index+1}}
+          <li class="song url"  v-for="(item,index) in currentData" v-if="index < 6" :key="index">
+            <span class="range">{{index+1}}</span>
             <div class="poster">
               <img :src="item.picUrl" alt="picId">
             </div>
@@ -66,7 +74,7 @@
   import axios from "../plugins/axios";
 
   export default {
-    name: "musicList",
+    name: "musicList", //音乐榜单组件
     data(){
       return{
         currentData:[]
@@ -82,7 +90,7 @@
       const url = this.url;
       if(url === "/album/list?limit=6"){
         axios.get(url).then(res=>{
-          console.log(res.data.products)
+          // console.log(res.data.products)
           this.currentData = res.data.products
         },2000).catch(error =>{
           console.log(error)
@@ -90,7 +98,7 @@
       }
       if(url === "/album/newest"){
         axios.get(url).then(res=>{
-          console.log(res.data.albums)
+          // console.log('albums',res.data.albums)
           this.currentData = res.data.albums
         },2000).catch(error =>{
           console.log(error)
@@ -98,7 +106,7 @@
       }
       if(url === "/top/artists?offset=0&limit=30"){
         axios.get(url).then(res=>{
-          console.log(res.data.artists)
+          // console.log(res.data.artists)
           this.currentData = res.data.artists
         },2000).catch(error =>{
           console.log(error)
@@ -136,6 +144,7 @@
   }
   .panel .list li .poster img{
     border: 1px solid #eee;
+    border-radius: 15px;
   }
   .info{
     flex: 1;
@@ -166,6 +175,9 @@
     text-align: center;
     height: 32px;
     line-height: 32px;
+  }
+  .range{
+    padding-right: 5px;
   }
 
 </style>

@@ -4,7 +4,11 @@
     <todayRecommend></todayRecommend>
     <NewsMusic></NewsMusic>
     <musicListNav></musicListNav>
-    <router-view></router-view>
+    <keep-alive>
+      <!-- 保持数据缓存 -->
+      <router-view></router-view>
+    </keep-alive>
+    <todayRecommend title="热门歌单" url="/artists?id=6452"></todayRecommend>
   </div>
 </template>
 

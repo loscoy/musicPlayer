@@ -6,10 +6,21 @@ import Artist from '@/pages/artist'
 import topList from '@/pages/topList'
 import Search from '@/pages/search'
 import Ucenter from '@/pages/ucenter'
+
 Vue.use(Router)
 
 export default new Router({
   routes: [
+    {
+      path: "/musicplay",
+      name: "musicPlay",
+      component: () => import("@/pages/musicPlay")
+    },
+    {
+      path: "/musicplay2",
+      name: "musicPlay2",
+      component: () => import("@/pages/musicPlay2")
+    },
     {
       path: '/',
       name: 'Index',
@@ -19,7 +30,7 @@ export default new Router({
         {
           path: "home",
           component: Home,
-          redirect: '/home/hot',
+          redirect: '/home/digital',
           children:[
             {
               path: 'digital',
@@ -50,7 +61,12 @@ export default new Router({
         {
           path: "ucenter",
           component: Ucenter
-        }
+        },
+        {
+          path: "morelist",
+          name: "moreList",
+          component: () => import('@/pages/moreList')
+        },
       ]
     }
   ]
