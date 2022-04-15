@@ -21,10 +21,13 @@
         <div class="song-lrc">
 <!--          <LRC2 :currentLyric="currentLyric" :currentLyricNum="currentLyricNum" :lrcId="parseInt(musicId)"></LRC2>-->
           <ul ref="ul" class="content">
-            <li v-for="(item,index) in currentLyric.lines" :key="index">{{item.txt}}</li>
+            <li :id="index" v-for="(item,index) in currentLyric.lines" :key="index">{{item.txt}}</li>
           </ul>
+          <div class="no-lyric" v-if="currentLyric.lines.length === 0">暂无歌词,请搜索重试</div>
         </div>
+
       </div>
+
       <div class="iconbox">
         <i @click="collectHandler" :class={ca:collectAction} class="iconfont icon-shoucang2 left"></i>
         <i class="box"></i>
@@ -58,8 +61,8 @@
         musicUrl: '',
         musicPic: this.$route.query.musicPic,
         currentTime:0,
-        durationTime:0,
-        lrcData:'',
+        // durationTime:0,
+        // lrcData:'',
         currentLyric:{},
         lyric: '',
         currentLyricNum:0,
@@ -70,9 +73,6 @@
         offset: -32,
         lrcLength:0,
       }
-    },
-    props:{
-      music:'',
     },
     components:{
       LRC2,
@@ -85,7 +85,6 @@
       const url = "/song/url?id=" + this.musicId
       axios.get(url).then(res=>{
         this.musicUrl = res.data.data[0].url
-        // console.log(this.lId[0].id)
       })
 
       const music = this.$refs.player  // 音频所在对象
@@ -136,12 +135,16 @@
         }
         list[this.lineNo].className = "lineHigh";//高亮显示当前行
 
-        //文字滚动
-        if(this.lineNo > this.Cpos){
-          ulist.style.transform = "translateY("+(this.lineNo-this.Cpos)*this.offset+"px)"; //整体向上滚动一行高度
-        }
-      },
+        //滚动至指定元素
+        const element = document.getElementById(this.lineNo);
+        // console.log('id',element,this.lineNo)
+        element.scrollIntoView({behavior: "smooth", block: "center"});
 
+        // 文字滚动 此方法已弃用
+        /*if(this.lineNo > this.Cpos){
+          ulist.style.transform = "translateY("+(this.lineNo-this.Cpos)*this.offset+"px)"; //整体向上滚动一行高度
+        }*/
+      },
       // 重新播放是歌词重置事件
       goback() {
         const ulist = this.$refs.ul
@@ -193,7 +196,7 @@
   .song-lrc{
     margin-top: 30px;
     min-height: 50px;
-    overflow: hidden;
+    overflow: scroll;
     position: absolute;
     right: 0;
     left: 0;
@@ -236,6 +239,12 @@
     color: #ff0000;
     font-size: 20px;
   }
-
+  div::-webkit-scrollbar {
+    display: none;
+  }
+  /*.no-lyric {*/
+  /*  color: #222222;*/
+  /*  text-align: center;*/
+  /*}*/
 
 </style>
