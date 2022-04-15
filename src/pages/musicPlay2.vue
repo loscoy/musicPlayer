@@ -21,9 +21,9 @@
         <div class="song-lrc">
 <!--          <LRC2 :currentLyric="currentLyric" :currentLyricNum="currentLyricNum" :lrcId="parseInt(musicId)"></LRC2>-->
           <ul ref="ul" class="content">
-            <li :id="index" v-for="(item,index) in currentLyric.lines" :key="index">{{item.txt}}</li>
+            <li :id="index" v-for="(item,index) in currentLyric.lines" @click="playThis(index)" :key="index">{{item.txt}}</li>
           </ul>
-          <div class="no-lyric" v-if="currentLyric.lines.length === 0">暂无歌词,请搜索重试</div>
+          <div class="no-lyric" v-if="lrcLength === 0">暂无歌词,请搜索重试</div>
         </div>
 
       </div>
@@ -86,7 +86,6 @@
       axios.get(url).then(res=>{
         this.musicUrl = res.data.data[0].url
       })
-
       const music = this.$refs.player  // 音频所在对象
       music.addEventListener('timeupdate', () => {
         if(this.lineNo===this.lrcLength)
@@ -101,6 +100,24 @@
         this.goback(); //回滚歌词
         music.play()
       })
+    },
+    beforeDestroyed:{
+      removeEventListeners(){
+        const music = this.$refs.player  // 音频所在对象
+        music.removeEventListener('timeupdate', () => {
+          if(this.lineNo===this.lrcLength)
+            return;
+          const curTime = music.currentTime; //播放器时间
+          if(this.currentLyric.lines[this.lineNo].time <= curTime * 1000){
+            this.lineHigh();//高亮当前行
+            this.lineNo++;
+          }
+        })
+        music.removeEventListener('ended', () => {
+          this.goback(); //回滚歌词
+          music.play()
+        })
+      },
     },
     methods: {
       // 异步获取歌词
@@ -125,6 +142,20 @@
       lyricHandle({ lineNum, txt }) {
 
       },
+      //点击播放
+      playThis(index) {
+        const music = this.$refs.player
+        const ulist = this.$refs.ul
+        const list = ulist.getElementsByTagName("li");
+
+        // 删除之前的高亮样式与设置当前点击部分高亮样式
+        list[this.lineNo-1].removeAttribute("class");//去掉上一行的高亮样式
+        this.lineNo = index
+        list[this.lineNo].className = "lineHigh";//高亮显示当前行
+
+        // 将所点歌词时间赋给播放时间
+        music.currentTime = (this.currentLyric.lines[this.lineNo].time) / 1000
+      },
 
       // 高亮歌词滚动事件
       lineHigh() {
@@ -134,7 +165,6 @@
           list[this.lineNo-1].removeAttribute("class");//去掉上一行的高亮样式
         }
         list[this.lineNo].className = "lineHigh";//高亮显示当前行
-
         //滚动至指定元素
         const element = document.getElementById(this.lineNo);
         // console.log('id',element,this.lineNo)

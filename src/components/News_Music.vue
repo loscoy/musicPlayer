@@ -41,7 +41,7 @@
     mounted(){
       const url = "/album/newest";
       axios.get(url).then(res=>{
-        console.log('new',res.data.albums)
+        // console.log('new',res.data.albums)
         this.NewsMusic = res.data.albums
       },2000).catch(error =>{
         console.log(error)
