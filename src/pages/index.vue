@@ -51,6 +51,7 @@
     line-height: 50px;
     background: #f9f9f9;
     list-style: none;
+    width: 100%;
   }
   .index ul li{
     flex: 1;

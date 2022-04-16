@@ -8,7 +8,9 @@
           <router-link :to="{name:'musicPlay2',query:{musicId:item.id,musicName:item.name,musicArtist:item.song.artists[0].name,musicPic:item.picUrl}}" custom v-slot="{navigate}">
             <div @click="navigate" role="link">
               <div class="poster">
-                <img :src="item.picUrl" :alt="item.name">
+                <div class="img">
+                  <img :src="item.picUrl" :alt="item.name">
+                </div>
               </div>
               <div class="text-wrap">
                 <div class="name">{{item.name}}</div>
@@ -29,7 +31,9 @@
           <router-link :to="{name:'musicPlay2',query:{musicId:item.id, musicName:item.name, musicArtist:item.ar[1].name + '/' + item.ar[0].name,musicPic:item.al.picUrl}}" custom v-slot="{navigate}">
             <div @click="navigate" role="link">
               <div class="poster">
-                <img :src="item.al.picUrl" :alt="item.name">
+                <div class="img">
+                  <img :src="item.al.picUrl" :alt="item.name">
+                </div>
               </div>
               <div class="text-wrap">
                 <div class="name">{{item.name}}</div>
@@ -49,7 +53,9 @@
           <router-link :to="{name:'musicPlay2',query:{musicId:item.id,musicName:item.name,musicArtist:item.artists.name,musicPic:item.picUrl}}" custom v-slot="{navigate}">
             <div @click="navigate" role="link">
               <div class="poster">
-                <img :src="item.picUrl" :alt="item.name">
+                <div class="img">
+                 <img :src="item.picUrl" :alt="item.name">
+                </div>
               </div>
               <div class="text-wrap">
                 <div class="name">{{item.name}}</div>
@@ -192,9 +198,19 @@
     margin-bottom: 10px;
     position: relative;
   }
+  .img{
+    position:relative;
+    width:100%;
+    height:0;
+    padding-top: 100%;
+    margin-bottom: 5px;
+  }
   img{
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
     width: 100%;
-    height: 157.57px;
     border: 1px solid #eee;
     border-radius: 15px;
   }
@@ -203,9 +219,9 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    margin-top: 4px;
     line-height: 14px;
     max-height: 28px;
+    margin-top: 5px;
     margin-bottom: 2px;
   }
   .author{

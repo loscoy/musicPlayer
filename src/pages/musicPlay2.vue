@@ -46,7 +46,7 @@
   import axios from "@/plugins/axios"
   import iconfont from "@/assets/font/iconfont.css"
   import Lyric from 'lyric-parser'
-  import {getLyric} from "../lrcApi/lrc";
+  import {getLyric} from "../Api/music";
   // import LRC from "../components/LRC";
 
   const LRC2 = Vue.component("lrc",(resolve)=>require(["../components/LRC2"],resolve))

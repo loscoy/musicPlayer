@@ -12,7 +12,9 @@
             <div class="card url" v-for="(item,index) in todayRecommend.slice(0, 6)" :key="index">
               <router-link :to="{name:'musicPlay2',query:{musicId:item.id,musicName:item.name,musicArtist:item.song.artists[0].name,musicPic:item.picUrl}}" custom v-slot="{navigate}">
                 <div class="album" @click="navigate" @keypress.enter="navigate" role="link">
-                  <img :src="item.picUrl" :alt="item.name">
+                  <div class="img">
+                    <img :src="item.picUrl" :alt="item.name">
+                  </div>
                   <div class="name">{{item.name}}</div>
                 </div>
               </router-link>
@@ -32,11 +34,12 @@
     <div class="container">
       <div class="gallery">
         <div class="scroller">
-          <!-- 如何只显示六个？？-->
           <div class="card url" v-for="(item,index) in todayRecommend" v-if="item.al.picUrl !== null && index <= 6" :key="index">
             <router-link :to="{name:'musicPlay2',query:{musicId:item.id, musicName:item.name, musicArtist:item.ar[1].name + '/' + item.ar[0].name,musicPic:item.al.picUrl}}" custom v-slot="{navigate}">
               <div class="album" @click="navigate" @keypress.enter="navigate" role="link">
-                <img :src="item.al.picUrl" :alt="item.name">
+                <div class="img">
+                  <img :src="item.al.picUrl" :alt="item.name">
+                </div>
                 <div class="name">{{item.name}}</div>
               </div>
             </router-link>
@@ -131,9 +134,18 @@
   .mod-albums .gallery .card .album{
     position: relative;
   }
+  .img{
+    position:relative;
+    width:100%;
+    height:0;
+    padding-top: 100%;
+  }
   .mod-albums .gallery .card img{
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
     width: 100%;
-    height: 107px;
     border: 1px solid #eee;
     border-radius: 15px;
   }

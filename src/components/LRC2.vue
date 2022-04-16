@@ -28,7 +28,7 @@
 <script>
   import Scroll from './Scroll/Scroll'
   import Lyric from 'lyric-parser'
-  import {getLyric} from "../lrcApi/lrc";
+  import {getLyric} from "../Api/music";
 
   export default {
     name: 'LRC2',

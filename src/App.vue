@@ -94,9 +94,9 @@ export default {
     float: right;
   }
   body{
-    margin: 0 auto;
-    max-width: 640px;
-    min-width: 320px;
+    margin: 0 0 0 0;
+    /*max-width: 640px;*/
+    /*min-width: 320px;*/
     color: #555;
     background: #f1f1f1;
     height: 100%;
