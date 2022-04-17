@@ -1,8 +1,8 @@
 import api from "../plugins/axios";
 
-export function getLyric(url) {
+export function getLyric(id) {
   return api({
-    url: url,
+    url: "/lyric?id=" + id,
     method: "get"
   })
 }

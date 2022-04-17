@@ -1,14 +1,16 @@
 <template>
   <div class="search">
     <el-autocomplete
+      ref="autocomplete"
       prefix-icon="el-icon-search"
       class="searchInput"
       v-model="searchName"
-      :trigger-on-focus="false"
+      :trigger-on-focus="true"
       :fetch-suggestions="queryS"
       @select="goToSelected"
+      :debounce=10
       :placeholder="searchDefault"
-      @keypress.native.enter="submitSearch(searchName)"
+      @keypress.enter.native="submitSearch(searchName)"
     >
       <el-button slot="append" @click="submitSearch(searchName)" icon="el-icon-search"></el-button>
     </el-autocomplete>
@@ -45,31 +47,44 @@
     mounted() {
       getSearchDefault().then(res=>{
         this.searchDefault = res.data.data.showKeyword
+        this.hendleDefault()
       });
     },
     methods:{
       queryS(queryString,cb){
-        if (queryString){
-          getSearchList(queryString,this.limit).then(res=>{
-            setTimeout(()=>{
+        if (queryString) {
+          getSearchList(queryString, this.limit).then(res => {
               this.searchList = res.data.result.songs
               cb(this.getSearchList())
-            },1000)
           })
         }
       },
       getSearchList(){
         let arr = new Array(0)
-        this.searchList.forEach(item=>{
-          if(item.artists[1]){
+        this.searchList.forEach((item,index)=>{
+          if (item.artists.length > 1){
+            // console.log(item);
+            let l = item.artists.length
+            let s = ''
             arr.push({
               id:item.id,
-              value:item.name + ' - ' + item.artists[0].name + ' / ' + item.artists[1].name,
+              value: '',
+              artist:''
             })
+            for(let i=0;i<l;i++){
+              if (i+1 < l){
+                s = s.concat(item.artists[i].name + ' / ')
+              }else{
+                s = s.concat(item.artists[i].name)
+              }
+            }
+            arr[index]["value"] = item.name + ' - ' + s
+            arr[index]["artist"] = s
           }else{
             arr.push({
               id:item.id,
               value:item.name + ' - ' + item.artists[0].name,
+              artist:item.artists[0].name
             })
           }
         })
@@ -78,19 +93,22 @@
       goToSelected(item){
         getDetailInfo(item.id).then(res=>{
           this.musicInfo = res.data.songs[0]
-          this.$router.push({path:"/musicPlay2",query: {musicId:item.id,musicName:this.musicInfo.name,musicPic:this.musicInfo.al.picUrl}})
+          console.log(item);
+          this.$router.push({path:"/musicPlay2",query: {musicId:item.id,musicArtist:item.artist,musicName:this.musicInfo.name,musicPic:this.musicInfo.al.picUrl}})
         })
       },
       submitSearch(searchName){
-        this.searchListShow = true
-        this.hendleDefault()  //处理默认关键词
+        this.searchListShow = true //收起搜索建议
+        this.$refs.autocomplete.suggestions = [];
         // 不输入则使用默认关键词
         if (searchName === '' || searchName === null){
           this.searchName = this.newSearchDefault
         }
         getSearchList(this.searchName,this.limit).then(res=>{
           let searchList = res.data.result.songs
-          searchList.forEach(item=>{
+          // console.log(searchList);
+          this.newSearchList = []
+          searchList.forEach((item,index)=>{
             //多个歌手处理方式
             if (item.artists.length > 1){
               // console.log(item);
@@ -99,22 +117,21 @@
               this.newSearchList.push({
                 id:item.id,
                 name:item.name,
-                artist: ''
+                artist: '',
               })
               for(let i=0;i<l;i++){
-                if (i+1 !== l){
-                  s = s.concat(item.artists[i].name).concat(' / ')
+                if (i+1 < l){
+                  s = s.concat(item.artists[i].name + ' / ')
                 }else{
                   s = s.concat(item.artists[i].name)
                 }
               }
-              // console.log(s);
-              this.newSearchList.artist = s
+              this.newSearchList[index]["artist"] = s
             }else if (item.artists.length === 1){
               this.newSearchList.push({
                 id:item.id,
                 name:item.name,
-                artist: item.artists[0].name
+                artist: item.artists[0].name,
               })
             }
           })

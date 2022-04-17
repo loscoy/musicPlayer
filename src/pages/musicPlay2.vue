@@ -2,8 +2,8 @@
   <div class="play">
     <div class="header">
       <div class="title">
-        <router-link to="/">
-          <i class="iconfont icon-shouye left"></i>
+        <router-link to="">
+          <i class="iconfont icon-shouye left" @click="back"></i>
         </router-link>
         <div class="music-info">
           <p>{{musicName}}</p>
@@ -46,7 +46,7 @@
   import axios from "@/plugins/axios"
   import iconfont from "@/assets/font/iconfont.css"
   import Lyric from 'lyric-parser'
-  import {getLyric} from "../Api/music";
+  import {getDetailInfo, getLyric} from "../Api/music";
   // import LRC from "../components/LRC";
 
   const LRC2 = Vue.component("lrc",(resolve)=>require(["../components/LRC2"],resolve))
@@ -61,12 +61,9 @@
         musicUrl: '',
         musicPic: this.$route.query.musicPic,
         currentTime:0,
-        // durationTime:0,
-        // lrcData:'',
         currentLyric:{},
         lyric: '',
         currentLyricNum:0,
-        url : "/lyric?id=" + this.$route.query.musicId,
 
         lineNo: 0,
         Cpos: 3,
@@ -81,7 +78,7 @@
 
     },
     mounted() {
-      this.getLyric(this.url)
+      this.getLyric(this.musicId)
       const url = "/song/url?id=" + this.musicId
       axios.get(url).then(res=>{
         this.musicUrl = res.data.data[0].url
@@ -121,9 +118,9 @@
     },
     methods: {
       // 异步获取歌词
-      async getLyric(url) {
+      async getLyric(id) {
         try {
-          let res = await getLyric(url)
+          let res = await getLyric(id)
           this.lyric = res.data.lrc.lyric
           this.currentLyric = new Lyric(this.lyric, this.lyricHandle)
           this.lrcLength = this.currentLyric.lines.length
@@ -175,14 +172,16 @@
           ulist.style.transform = "translateY("+(this.lineNo-this.Cpos)*this.offset+"px)"; //整体向上滚动一行高度
         }*/
       },
-      // 重新播放是歌词重置事件
+      // 歌词重置
       goback() {
         const ulist = this.$refs.ul
         document.querySelector(".lineHigh").removeAttribute("class");
         ulist.style.transform = "translateY(0)";
         this.lineNo = 0; //lineNo清零，重新播放
       },
-
+      back(){
+        this.$router.go(-1);
+      }
     }
   }
 </script>
