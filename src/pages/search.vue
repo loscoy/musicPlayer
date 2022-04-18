@@ -40,6 +40,8 @@
         musicInfo: [],
         searchListShow: false,
         limit: 40,
+        Timer: null,
+        TimerList: []
       };
     },
     components:{
@@ -52,8 +54,18 @@
         this.hendleDefault()
       });
     },
-    computed: {
 
+    created(){
+      // this.timer()
+    },
+
+    destroyed() {
+      let that = this
+      this.TimerList.forEach((item,index)=>{
+        clearInterval(item)
+      })
+      this.TimerList = []
+      this.Timer = 0;
     },
     methods:{
       queryS(queryString,cb){
@@ -144,6 +156,20 @@
       },
       hendleDefault () {
         this.newSearchDefault = this.searchDefault.split(" - ")[0];
+      },
+
+      // 定时获取默认关键词
+      timer() {
+        this.Timer = setInterval(()=>{
+          clearInterval(this.timer)
+          getSearchDefault().then(res=>{
+            this.searchDefault = res.data.data.showKeyword
+            this.hendleDefault()
+            console.log(this.newSearchDefault);
+          }); //调用获取实时数据的方法
+        },5000)
+        this.TimerList.push(this.Timer)
+        return this.Timer
       },
 
     }
