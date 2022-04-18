@@ -15,8 +15,10 @@
       <el-button slot="append" @click="submitSearch(searchName)" icon="el-icon-search"></el-button>
     </el-autocomplete>
     <div class="container">
-      <hotSearch v-show="!searchListShow"></hotSearch>
-      <searchList v-show="searchListShow" ref="searchList" :searchName="searchName" :searchList="newSearchList"></searchList>
+      <div class="hot">
+        <hotSearch v-show="!searchListShow"></hotSearch>
+        <searchList v-show="searchListShow" ref="searchList" :searchName="searchName" :searchList="newSearchList"></searchList>
+      </div>
     </div>
   </div>
 </template>
@@ -29,16 +31,16 @@
   export default {
     name: "search",
     data(){
-      return{
-        searchName:'',
-        searchList:[],
-        newSearchList:[],
-        searchDefault:'',
-        newSearchDefault:'',
-        musicInfo:[],
-        searchListShow:false,
-        limit:40
-      }
+      return {
+        searchName: "",
+        searchList: [],
+        newSearchList: [],
+        searchDefault: "",
+        newSearchDefault: "",
+        musicInfo: [],
+        searchListShow: false,
+        limit: 40,
+      };
     },
     components:{
       hotSearch,
@@ -49,6 +51,9 @@
         this.searchDefault = res.data.data.showKeyword
         this.hendleDefault()
       });
+    },
+    computed: {
+
     },
     methods:{
       queryS(queryString,cb){
@@ -98,13 +103,13 @@
         })
       },
       submitSearch(searchName){
-        this.searchListShow = true //收起搜索建议
-        this.$refs.autocomplete.suggestions = [];
+        this.searchListShow = true
+        this.$refs.autocomplete.suggestions = [];//收起搜索建议
         // 不输入则使用默认关键词
         if (searchName === '' || searchName === null){
-          this.searchName = this.newSearchDefault
+          searchName = this.newSearchDefault
         }
-        getSearchList(this.searchName,this.limit).then(res=>{
+        getSearchList(searchName,this.limit).then(res=>{
           let searchList = res.data.result.songs
           // console.log(searchList);
           this.newSearchList = []
@@ -137,9 +142,10 @@
           })
         })
       },
-      hendleDefault(){
-        this.newSearchDefault = this.searchDefault.split(" - ")[0]
-      }
+      hendleDefault () {
+        this.newSearchDefault = this.searchDefault.split(" - ")[0];
+      },
+
     }
   }
 </script>
@@ -156,6 +162,10 @@
     margin: 10px 10px 0 10px;
     text-align: center;
   }
-
+  .hot{
+    width: 100%;
+    margin: 10px 10px 0 10px;
+    text-align: center;
+  }
 
 </style>

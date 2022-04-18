@@ -3,36 +3,124 @@
     <div class="title">
       热搜榜
     </div>
-<!--    <el-skeleton rows="6"/>-->
-    <ul>
-      <li>周杰伦</li>
-    </ul>
+    <el-skeleton style="width:100%;text-align: center;padding-top: 5px;" :loading="loading" animated><!--:throttle="1000"-->
+      <template slot="template">
+        <el-card :body-style="{ padding: '5px', marginBottom: '1px' }">
+          <div
+                  style="display: flex; align-items: center; justify-items: space-between;margin: 10px;height: 20px"
+                  v-for="i in 10" :key="i"
+          >
+            <el-skeleton-item variant="text" style="margin:10px;width: 50%" />
+            <el-skeleton-item variant="text" style="width: 50%;margin: 10px" />
+          </div>
+        </el-card>
+      </template>
+      <template #default>
+        <el-card :body-style="{ padding: '5px', marginBottom: '1px' }">
+          <div class="container">
+              <div class="info" v-for="(item,index) in hotSearchData" @click="search(item.searchWord)" :key="index">
+                <div class="text">
+                  <div class="i">{{index+1}}</div>
+                  <div class="w">{{item.searchWord}}</div>
+                  <div class="image" v-if="item.iconUrl !== 0"><img :src="item.iconUrl"></div>
+                </div>
+              </div>
+          </div>
+        </el-card>
+      </template>
+    </el-skeleton>
   </div>
 </template>
 
 <script>
+  import { getHotSearch } from "../Api/music";
+
   export default {
     name: "hotSearch",
-    props:{
-      searchListShow:true
-    }
-  }
+    data () {
+      return {
+        hotSearchData: [],
+        loading: false,
+        limit: 40,
+        searchInfo:[],
+      };
+    },
+    props: {
+    },
+    mounted () {
+      getHotSearch().then(res=>{
+        this.loading = true
+        this.hotSearchData = res.data.data
+        setTimeout(() => (this.loading = false), 500);
+      })
+    },
+    methods: {
+      search (keyWord) {
+        this.$parent.submitSearch(keyWord);
+      },
+    },
+  };
+
 </script>
 
 <style scoped>
 
-  body{
+  .hotSearch{
     text-align: center;
+    position: relative;
+    width: 95%;
+    /*display:flex;*/
+    margin-top: 15px;
+  }
+  .hotSearch .title{
+    width: 100%;
+    position: relative;
+    text-align: left;
+    height: 30px;
+  }
+  .container{
+    position: relative;
+    height: 300px;
+    width: 100%;
+  }
+  .info{
+    float: left;
+    width: 50%;
+    text-align: left;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    padding: 0 15px 10px;
+  }
+  .text{
+    font-size: 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-top: 4px;
+    line-height: 14px;
+    max-height: 28px;
+    margin-bottom: 2px;
+    display: flex;
+  }
+  .i{
+    text-align: left;
+    width: 30px;
+    color: #999999;
+  }
+  .w{
+    margin-right: 5px;
+  }
+  .image{
     align-items: center;
   }
-  .hotSearch{
-    position: relative;
-    border: solid;
-    width: 95%;
+  img {
+    max-width: 25%;
+    height: auto;
   }
-  .title{
-    text-align: left;
-    margin: 10px 40px;
+  div:active{
+
+    background-color:black;
+
   }
 
 </style>

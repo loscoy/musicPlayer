@@ -98,7 +98,7 @@ export default {
     /*max-width: 640px;*/
     /*min-width: 320px;*/
     color: #555;
-    background: #f1f1f1;
+    background: #f9f9f9;
     height: 100%;
   }
   a{
