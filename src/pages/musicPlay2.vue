@@ -6,8 +6,8 @@
           <i class="iconfont icon-shouye left" @click="back"></i>
         </router-link>
         <div class="music-info">
-          <p>{{musicName}}</p>
-          <p class="author">{{musicArtist}}</p>
+          <p>{{musicInfo.name}}</p>
+          <p class="author">{{artistName}}</p>
         </div>
         <router-link to="/search">
           <i class="iconfont icon-sousuo right"></i>
@@ -17,7 +17,7 @@
 
     <div class="song-info">
       <div class="song-info-img">
-        <img :src="musicPic" :alt="musicName">
+        <img :src="musicInfo.al.picUrl" :alt="musicName">
         <div class="song-lrc">
 <!--          <LRC2 :currentLyric="currentLyric" :currentLyricNum="currentLyricNum" :lrcId="parseInt(musicId)"></LRC2>-->
           <ul ref="ul" class="content">
@@ -46,7 +46,7 @@
   import axios from "@/plugins/axios"
   import iconfont from "@/assets/font/iconfont.css"
   import Lyric from 'lyric-parser'
-  import {getDetailInfo, getLyric} from "../Api/music";
+  import { getDetailInfo, getLyric, getMusicUrl } from "../Api/music";
   // import LRC from "../components/LRC";
 
   const LRC2 = Vue.component("lrc",(resolve)=>require(["../components/LRC2"],resolve))
@@ -56,15 +56,13 @@
     data(){
       return{
         musicId: this.$route.query.musicId,
-        musicName: this.$route.query.musicName,
-        musicArtist: this.$route.query.musicArtist,
         musicUrl: '',
-        musicPic: this.$route.query.musicPic,
         currentTime:0,
         currentLyric:{},
         lyric: '',
         currentLyricNum:0,
-
+        musicInfo: [],
+        artistName: '',
         lineNo: 0,
         Cpos: 3,
         offset: -32,
@@ -79,10 +77,13 @@
     },
     mounted() {
       this.getLyric(this.musicId)
-      const url = "/song/url?id=" + this.musicId
-      axios.get(url).then(res=>{
+      getMusicUrl(this.musicId).then(res=>{
         this.musicUrl = res.data.data[0].url
       })
+      getDetailInfo(this.musicId).then(res => {
+        this.musicInfo = res.data.songs[0];
+        this.handleArtist()
+      });
       const music = this.$refs.player  // 音频所在对象
       music.addEventListener('timeupdate', () => {
         if(this.lineNo===this.lrcLength)
@@ -138,6 +139,22 @@
 
       lyricHandle({ lineNum, txt }) {
 
+      },
+      handleArtist () {
+        let l = this.musicInfo.ar.length;
+        let s = "";
+        if (l > 1) {
+          for (let i = 0; i < l; i++) {
+            if (i + 1 < l) {
+              s = s.concat(this.musicInfo.ar[i].name + " / ");
+            } else {
+              s = s.concat(this.musicInfo.ar[i].name);
+            }
+          }
+          this.artistName = s;
+        } else {
+          this.artistName = this.musicInfo.ar[0].name;
+        }
       },
       //点击播放
       playThis(index) {

@@ -1,35 +1,38 @@
 <template>
   <div class="login">
-    <el-input v-model="phone" placeholder="手机号码"></el-input>
-    <el-input v-model="password" placeholder="密码"></el-input>
+    <el-input class="input" v-model="phone" placeholder="手机号码"></el-input>
+    <el-input class="input" v-model="password" type="password" placeholder="密码"></el-input>
     <el-button @click="submitLogin(phone,password)">登录</el-button>
     <el-button @click="logout">退出</el-button>
+    <el-link type="info">
+      <router-link to="/home">
+        暂不登录
+      </router-link>
+    </el-link>
   </div>
 </template>
 
 <script>
-  import { loginStatus, login, logOut } from "../../Api/user";
+  import { login, logOut } from "../../Api/user";
+  import { mapActions, mapState } from "vuex";
   export default {
     name: "login",
     data () {
       return {
         phone: "",
         password: "",
-        user:[],
-        status:[],
-        token:sessionStorage.getItem('token')
       };
     },
+    computed :{
+      ...mapState({token:state => state.user.token}),
+    },
     mounted () {
-      this.status = []
-      loginStatus().then(res=>{
-        this.status = res.data.data
-        console.log('status',this.status);
-        console.log(this.token);
-      })
+      console.log(this.token);
     },
     methods:{
+      ...mapActions(['setToken','clearToken']),
       submitLogin (phone, password) {
+        let that = this
         if (phone === "" || password === "") {
           this.$message({
             type: "warning",
@@ -44,15 +47,12 @@
         } else {
           login(phone, password).then(res => {
             if (res.data.code === 200) {
-              this.user = res.data;
 
-              localStorage.clear();
               sessionStorage.clear();
-              sessionStorage.setItem("userid", JSON.stringify(res.data.profile.userId));
-              sessionStorage["token"] = JSON.stringify(res.data.token);
-              localStorage.setItem("token", res.data.token);
-              this.$store.dispatch('setToken',JSON.stringify(res.data.token))
-
+              sessionStorage.setItem("userid", res.data.profile.userId);
+              sessionStorage["token"] = res.data.token;
+              // this.$store.dispatch('setToken',{token: res.data.token, id: res.data.profile.userId})
+              that.setToken('setToken',{token: res.data.token, id: res.data.profile.userId}) //同上写法
               this.$router.push("/home");
               this.$message({
                 type: "success",
@@ -61,29 +61,27 @@
             } else {
               this.$message({
                 type: "warning",
-                message: res.data.msg,
+                message: '错误' + res.data.msg,
               });
             }
             console.log(res.data);
-
           }).catch(error => {
             console.log(error);
           });
         }
       },
-      logout(){
-
-        if(this.status.account !== null){
-          logOut().then(res=>{
+      logout () {
+        let that = this
+        if (this.token !== null) {
+          logOut().then(res => {
             console.log(res);
-          })
+          });
           sessionStorage.clear();
-          localStorage.clear();
-          this.$store.dispatch("clearToken")
-        }else{
-          this.$message("未登录")
+          that.clearToken("clearToken");
+        } else {
+          this.$message("未登录");
         }
-      }
+      },
     },
   };
 </script>

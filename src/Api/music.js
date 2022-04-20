@@ -36,3 +36,12 @@ export function getDetailInfo(id) {
     method:"get"
   })
 }
+export function getPlaylistDetail (playListId) {
+  return api.get('/playlist/detail?id=' + playListId)
+}
+export function getAllPlaylistMusic (playListId) {
+  return api.get("/playlist/track/all?id=" + playListId)
+}
+export function getMusicUrl(musicId){
+  return api.get("/song/url?id=" + musicId)
+}

@@ -1,13 +1,13 @@
 <template>
   <div class="searchList">
-    <el-card class="box-card">
+    <el-card class="box-card" :body-style="{'height':showall}">
       <div slot="header" class="clearfix">
         <span>单曲</span>
       </div>
       <el-skeleton style="width:100%;text-align: center;padding-top: 5px;" :loading="loading" animated>
         <template #template>
           <div
-                  style="display: flex; flex-direction: column; align-items: flex-start; justify-items: space-between;"
+                  style="display: flex; flex-direction: column; align-items: flex-start; justify-content: space-between;"
                   v-for="i in 10" :key="i"
           >
             <el-skeleton-item variant="text" style="width: 30%" />
@@ -17,12 +17,20 @@
         </template>
 
         <template #default>
-            <div v-for="(item,index) in newSearchList" @click="goToSelected(item.id)" :key="index" class="text item">
+          <div class="temp">
+            <div>
+              <div v-for="(item,index) in newSearchList" @click="goToSelected(item.id)" :key="index" class="text item">
                 <div class="name">{{item.name}}</div>
                 <div class="artist">{{item.artist}}</div>
                 <div></div>
                 <el-divider></el-divider>
+              </div>
+              <div style="font-size: 14px">无更多数据</div>
             </div>
+            <div class="showMore" v-if="showall==='470px'" @click="showAll">
+              <el-card body-style="padding:0;width:100%">查看更多</el-card>
+            </div>
+          </div>
         </template>
       </el-skeleton>
     </el-card>
@@ -40,7 +48,8 @@
         newSearchList:this.searchList,
         musicInfo:[],
         artistName:'',
-        loading:false
+        loading:false,
+        showall:'470px'
       }
     },
     props:{
@@ -50,45 +59,27 @@
     watch:{
       // 监听父组件传值变化
       searchList(val){
-
         this.newSearchList = val;
         setTimeout(()=>(this.loading = false),500)
-      }
+      },
+    },
+    computed: {
+
     },
     mounted() {
       this.loading = true
     },
     methods: {
       goToSelected (index) {
-        getDetailInfo(index).then(res => {
-          this.musicInfo = res.data.songs[0];
-          this.artistName = "";
-          // console.log(this.musicInfo.ar.length);
-          let l = this.musicInfo.ar.length;
-          let s = "";
-          if (l > 1) {
-            for (let i = 0; i < l; i++) {
-              if (i + 1 < l) {
-                s = s.concat(this.musicInfo.ar[i].name + " / ");
-              } else {
-                s = s.concat(this.musicInfo.ar[i].name);
-              }
-            }
-            this.artistName = s;
-          } else {
-            this.artistName = this.musicInfo.ar[0].name;
-          }
-          // console.log(this.artistName);
           this.$router.push({
             path: "/musicPlay2",
             query: {
               musicId: index,
-              musicName: this.musicInfo.name,
-              musicArtist: this.artistName,
-              musicPic: this.musicInfo.al.picUrl,
             },
           });
-        });
+      },
+      showAll () {
+        this.showall = '100%'
       },
     },
   }
@@ -100,11 +91,9 @@
     position: relative;
     width: 95%;
     display:flex;
+    flex-wrap: wrap;
     justify-content: center;
     margin-top: 10px;
-  }
-  .clearfix .text{
-    font-size: 12px;
   }
   .item {
     margin-bottom: 18px;
@@ -134,5 +123,13 @@
   }
   .clearfix span{
     font-weight: bolder;
+  }
+  .showMore{
+    position: absolute;
+    top: 560px;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 30px;
   }
 </style>

@@ -7,7 +7,7 @@
       <template slot="template">
         <el-card :body-style="{ padding: '5px', marginBottom: '1px' }">
           <div
-                  style="display: flex; align-items: center; justify-items: space-between;margin: 10px;height: 20px"
+                  style="display: flex; align-items: center; justify-content: space-between;margin: 10px;height: 20px"
                   v-for="i in 10" :key="i"
           >
             <el-skeleton-item variant="text" style="margin:10px;width: 50%" />
@@ -117,10 +117,10 @@
     max-width: 25%;
     height: auto;
   }
-  div:active{
+ /*.container div:active{*/
 
-    background-color:black;
+ /*   background-color:black;*/
 
-  }
+ /* }*/
 
 </style>

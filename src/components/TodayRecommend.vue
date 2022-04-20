@@ -1,53 +1,72 @@
 <template>
-  <div class="mod-albums" v-if="this.url === '/personalized/newsong'">
-    <div class="hd log url">
-      <h2>{{title}}</h2>
-      <router-link :to="{ name:'moreList', query:{ url:url,title:title}}" custom v-slot="{ navigate }">
-        <div @click="navigate" role="link">更多</div>
-      </router-link>
-    </div>
-    <div class="container">
-      <div class="gallery">
-        <div class="scroller">
-            <div class="card url" v-for="(item,index) in todayRecommend.slice(0, 6)" :key="index">
-              <router-link :to="{name:'musicPlay2',query:{musicId:item.id,musicName:item.name,musicArtist:item.song.artists[0].name,musicPic:item.picUrl}}" custom v-slot="{navigate}">
-                <div class="album" @click="navigate" @keypress.enter="navigate" role="link">
-                  <div class="img">
-                    <img :src="item.picUrl" :alt="item.name">
-                  </div>
-                  <div class="name">{{item.name}}</div>
-                </div>
-              </router-link>
-            </div>
-        </div>
-      </div>
-    </div>
-  </div>
 
-  <div class="mod-albums" v-else-if="this.url === '/artists?id=6452'">
-    <div class="hd log url" >
-      <h2>{{title}}</h2>
-      <router-link :to="{name:'moreList',query:{url:url,title:title}}" custom v-slot="{ navigate }">
-        <div @click="navigate" role="link">更多</div>
-      </router-link>
-    </div>
-    <div class="container">
-      <div class="gallery">
-        <div class="scroller">
-          <div class="card url" v-for="(item,index) in todayRecommend" v-if="item.al.picUrl !== null && index <= 6" :key="index">
-            <router-link :to="{name:'musicPlay2',query:{musicId:item.id, musicName:item.name, musicArtist:item.ar[1].name + '/' + item.ar[0].name,musicPic:item.al.picUrl}}" custom v-slot="{navigate}">
-              <div class="album" @click="navigate" @keypress.enter="navigate" role="link">
-                <div class="img">
-                  <img :src="item.al.picUrl" :alt="item.name">
-                </div>
-                <div class="name">{{item.name}}</div>
-              </div>
-            </router-link>
+  <el-skeleton animated :loading="loading">
+    <template #template>
+      <div style="display: flex;flex-wrap: wrap;justify-content: center;width: 100%">
+        <div style="width: 95%;margin-top: 10px">
+          <el-skeleton-item style="width: 30%;float: left;height: 20px"></el-skeleton-item>
+          <el-skeleton-item style="width: 20%;float: right;height: 20px"></el-skeleton-item>
+          <div style="width:100%;display: flex;flex-wrap: wrap">
+            <div style="width: 33%;" v-for="i in 6" :key="i">
+              <el-skeleton-item variant="image" style="height: 100px;margin:10px;border-radius: 10px"></el-skeleton-item>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </div>
+    </template>
+
+    <template >
+      <div class="mod-albums" v-if="this.url === '/personalized/newsong'">
+        <div class="hd log url">
+          <h2>{{title}}</h2>
+          <router-link :to="{ name:'moreList', query:{ url:url,title:title}}" custom v-slot="{ navigate }">
+            <div @click="navigate" role="link">更多</div>
+          </router-link>
+        </div>
+        <div class="container">
+          <div class="gallery">
+            <div class="scroller">
+                <div class="card url" v-for="(item,index) in todayRecommend.slice(0, 6)" :key="index">
+                  <router-link :to="{name:'musicPlay2',query:{musicId:item.id}}" custom v-slot="{navigate}">
+                    <div class="album" @click="navigate" @keypress.enter="navigate" role="link">
+                      <div class="img">
+                        <img :src="item.picUrl" :alt="item.name">
+                      </div>
+                      <div class="name">{{item.name}}</div>
+                    </div>
+                  </router-link>
+                </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mod-albums" v-else-if="this.url === '/artists?id=6452'">
+        <div class="hd log url" >
+          <h2>{{title}}</h2>
+          <router-link :to="{name:'moreList',query:{url:url,title:title}}" custom v-slot="{ navigate }">
+            <div @click="navigate" role="link">更多</div>
+          </router-link>
+        </div>
+        <div class="container">
+          <div class="gallery">
+            <div class="scroller">
+              <div class="card url" v-for="(item,index) in todayRecommend" v-if="item.al.picUrl !== null && index <= 6" :key="index">
+                <router-link :to="{name:'musicPlay2',query:{musicId:item.id}}" custom v-slot="{navigate}">
+                  <div class="album" @click="navigate" @keypress.enter="navigate" role="link">
+                    <div class="img">
+                      <img :src="item.al.picUrl" :alt="item.name">
+                    </div>
+                    <div class="name">{{item.name}}</div>
+                  </div>
+                </router-link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </template>
+  </el-skeleton>
 </template>
 
 <script>
@@ -58,6 +77,7 @@
     data(){
       return{
         todayRecommend: [],
+        loading:false
       }
     },
     props:{
@@ -71,10 +91,11 @@
       }
     },
     mounted(){
+      this.loading = true
       if(this.url === "/personalized/newsong"){
         axios.get(this.url).then(res=>{
-          // console.log(res.data)
           this.todayRecommend = res.data.result
+
         },2000).catch(error =>{
           console.log(error)
         })
@@ -82,11 +103,13 @@
       if (this.url === "/artists?id=6452"){
         axios.get(this.url).then(res=>{
           this.todayRecommend = res.data.hotSongs
-          // console.log(res.data.hotSongs[0].ar[1].name)
         },2000).catch(error =>{
           console.log(error)
         })
       }
+      setTimeout(() => {
+        this.loading = false;
+      },1000);
     },
     computed: {
 

@@ -25,7 +25,7 @@
         </div>
 
         <div v-if="url==='/album/newest'"  v-for="(item,index) in currentData.slice(0,6)" :key="index">
-          <router-link :to="{name:'musicPlay2',query:{musicId:item.id,musicName:item.name,musicArtist:item.artists.name,musicPic:item.picUrl}}" custom v-slot="{navigate}">
+          <router-link :to="{name:'musicPlay2',query:{musicId:item.id}}" custom v-slot="{navigate}">
             <div @click="navigate" role="link">
               <li class="song url">
                 <span class="range">{{index+1}}</span>

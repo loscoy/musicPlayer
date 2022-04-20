@@ -5,7 +5,7 @@
       <vue-pull-refresh :on-refresh="onRefresh">
         <h3>{{this.$route.query.title}}</h3>
         <div class="info url log" v-for="(item,index) in morelist" :key="index">
-          <router-link :to="{name:'musicPlay2',query:{musicId:item.id,musicName:item.name,musicArtist:item.song.artists[0].name,musicPic:item.picUrl}}" custom v-slot="{navigate}">
+          <router-link :to="{name:'musicPlay2',query:{musicId:item.id}}" custom v-slot="{navigate}">
             <div @click="navigate" role="link">
               <div class="poster">
                 <div class="img">
@@ -28,7 +28,7 @@
       <vue-pull-refresh :on-refresh="onRefresh">
         <h3>{{this.$route.query.title}}</h3>
         <div class="info url log" v-for="(item,index) in morelist" :key="index">
-          <router-link :to="{name:'musicPlay2',query:{musicId:item.id, musicName:item.name, musicArtist:item.ar[1].name + '/' + item.ar[0].name,musicPic:item.al.picUrl}}" custom v-slot="{navigate}">
+          <router-link :to="{name:'musicPlay2',query:{musicId:item.id}}" custom v-slot="{navigate}">
             <div @click="navigate" role="link">
               <div class="poster">
                 <div class="img">
@@ -50,7 +50,7 @@
       <vue-pull-refresh :on-refresh="onRefresh">
         <h3>{{this.$route.query.title}}</h3>
         <div class="info url log" v-for="(item,index) in morelist" :key="index">
-          <router-link :to="{name:'musicPlay2',query:{musicId:item.id,musicName:item.name,musicArtist:item.artists.name,musicPic:item.picUrl}}" custom v-slot="{navigate}">
+          <router-link :to="{name:'musicPlay2',query:{musicId:item.id}}" custom v-slot="{navigate}">
             <div @click="navigate" role="link">
               <div class="poster">
                 <div class="img">

@@ -6,13 +6,16 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    token: localStorage.getItem("token") || ''  //初始化token
+    user: {
+      token: sessionStorage.getItem("token") || "",
+      id: sessionStorage.getItem("userid") || "",
+    },
+
   },
   mutations: {
-    //存储token方法
-    //设置token等于外部传递进来的值
-    SET_TOKEN:(state, token)=>{
-      state.token = token
+    SET_USER:(state, data)=>{
+      state.user.token = data.token
+      state.user.id = data.id
     }
   },
   getters : {
@@ -20,11 +23,11 @@ export default new Vuex.Store({
   },
   // vue代码里面 this.$store.dispatch触发action里面的定义的方法
   actions: {
-    setToken(context,token){
-      context.commit('SET_TOKEN',token)
+    setToken({ commit }, data){
+      commit('SET_USER', data)
     },
-    clearToken(context){
-      context.commit('SET_TOKEN','')
+    clearToken({ commit }){
+      commit('SET_USER','')
     }
   }
 })

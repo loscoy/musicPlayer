@@ -40,8 +40,6 @@
         musicInfo: [],
         searchListShow: false,
         limit: 40,
-        Timer: null,
-        TimerList: []
       };
     },
     components:{
@@ -55,18 +53,15 @@
       });
     },
 
-    created(){
-      // this.timer()
+    watch:{
+      // searchDefault(){
+      //   getSearchDefault().then(res=>{
+      //     this.searchDefault = res.data.data.showKeyword
+      //     this.hendleDefault()
+      //   });
+      // }
     },
 
-    destroyed() {
-      let that = this
-      this.TimerList.forEach((item,index)=>{
-        clearInterval(item)
-      })
-      this.TimerList = []
-      this.Timer = 0;
-    },
     methods:{
       queryS(queryString,cb){
         if (queryString) {
@@ -111,7 +106,7 @@
         getDetailInfo(item.id).then(res=>{
           this.musicInfo = res.data.songs[0]
           console.log(item);
-          this.$router.push({path:"/musicPlay2",query: {musicId:item.id,musicArtist:item.artist,musicName:this.musicInfo.name,musicPic:this.musicInfo.al.picUrl}})
+          this.$router.push({path:"/musicPlay2",query: {musicId:item.id}})
         })
       },
       submitSearch(searchName){
@@ -157,21 +152,6 @@
       hendleDefault () {
         this.newSearchDefault = this.searchDefault.split(" - ")[0];
       },
-
-      // 定时获取默认关键词
-      timer() {
-        this.Timer = setInterval(()=>{
-          clearInterval(this.timer)
-          getSearchDefault().then(res=>{
-            this.searchDefault = res.data.data.showKeyword
-            this.hendleDefault()
-            console.log(this.newSearchDefault);
-          }); //调用获取实时数据的方法
-        },5000)
-        this.TimerList.push(this.Timer)
-        return this.Timer
-      },
-
     }
   }
 </script>

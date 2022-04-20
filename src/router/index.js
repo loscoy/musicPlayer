@@ -6,10 +6,11 @@ import Artist from '@/pages/artist'
 import topList from '@/pages/topList'
 import Search from '@/pages/search'
 import Ucenter from '@/pages/ucenter'
+import {Notification} from "element-ui";
 
 Vue.use(Router)
 
-export default new Router({
+const router = new Router({
   routes: [
     {
       path:"/loginpage",
@@ -76,6 +77,21 @@ export default new Router({
         {
           path: "ucenter",
           component: Ucenter,
+          redirect: "/ucenter/created",
+          children:[
+            {
+              path:'created',
+              component:()=>import('@/components/ucenter/createdPlaylist'),
+            },
+            {
+              path:'collect',
+              component: () => import("@/components/ucenter/collectPlaylist"),
+            }
+          ]
+        },
+        {
+          path: "Umlist",
+          component: () => import("@/pages/UmusicList"),
         },
         {
           path: "morelist",
@@ -84,18 +100,19 @@ export default new Router({
         },
       ],
     },
-    // Router.beforeEach((to, from, next) => {
-    //   if (to.path === '/loginPage/user') {
-    //     next();
-    //   } else {
-    //     let token = localStorage.getItem('Authorization');
-    //
-    //     if (token === null || token === '') {
-    //       next('/loginPage/user');
-    //     } else {
-    //       next();
-    //     }
-    //   }
-    // })
   ],
-})
+});
+// router.beforeEach((to, from, next) => {
+//     if (to.path === '/loginPage/login') {
+//       next();
+//     } else {
+//       let token = sessionStorage.getItem('token');
+//       if (token === null || token === '') {
+//         next('/loginPage/login');
+//       } else {
+//         next();
+//       }
+//     }
+// })
+
+export default router;

@@ -13,7 +13,11 @@ axios.interceptors.request.use(
       if (localStorage.getItem('token')) {
         config.headers = {
           'Content-Type': 'application/x-www-form-urlencoded',
-          "Authorization": window.localStorage.getItem('token')
+          "Authorization": sessionStorage.getItem('token')
+        }
+      }else{
+        config.headers = {
+          'Content-Type': 'application/x-www-form-urlencoded',
         }
       }
       config.data = qs.stringify(config.data, { arrayFormat: 'repeat' }) /*这里是，后端要求传数组的时候做的设置，以前出过错*/
@@ -31,7 +35,7 @@ axios.interceptors.response.use(
   }, error => {
     if(error.response.status === '401'){
       //要知道还有登录过期的情况，后台也是返回 ‘401’，所以这里就要有如果是这种情况的处理
-      window.localStorage.removeItem('token')
+      sessionStorage.clear()
       //别忘了import引入router就行
       router.replace({
         path:'/loginPage/user',

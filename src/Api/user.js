@@ -23,5 +23,8 @@ export function getUserInfo (id) {
     url:"/user/detail?uid=" + id,
     methods:"get"
   })
+}
 
+export function getMusicSheet (id) {
+  return api.get("/user/playlist?uid=" + id)
 }

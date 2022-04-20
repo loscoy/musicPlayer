@@ -1,30 +1,45 @@
 <template>
   <div class="mod-albums">
-    <div class="hd log url">
-      <h2>新歌速递</h2>
-      <router-link :to="{name:'moreList',query:{title:'新歌速递',url:'/album/newest'}}" v-slot="{navigate}">
-        <div @click="navigate" role="link">
-          更多
-        </div>
-      </router-link>
-    </div>
-
-    <div class="container">
-      <div class="gallery">
-        <div class="scroller">
-          <div class="card url" v-for="(item,index) in NewsMusic.slice(0,3)" :key="index">
-            <router-link :to="{name:'musicPlay2',query: {musicId:item.id,musicName:item.name,musicArtist:item.artist.name,musicPic:item.picUrl}}" custom v-slot="{navigate}">
-              <div class="album" @click="navigate" role="link">
-                <img :src="item.picUrl" alt="item.name">
-                <div class="name">{{item.name}}</div>
-                <div class="author">{{item.artist.name}}</div>
+    <el-skeleton animated :loading="loading">
+      <template #template>
+        <div style="display: flex;flex-wrap: wrap;justify-content: center;width: 100%">
+          <div style="width: 95%;margin-top: 10px">
+            <el-skeleton-item style="width: 30%;float: left;height: 20px"></el-skeleton-item>
+            <el-skeleton-item style="width: 20%;float: right;height: 20px"></el-skeleton-item>
+            <div style="width:100%;display: flex;flex-wrap: wrap">
+              <div style="width: 33%;" v-for="i in 6" :key="i">
+                <el-skeleton-item variant="image" style="height: 100px;margin:10px;border-radius: 10px"></el-skeleton-item>
               </div>
-            </router-link>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
-
+      </template>
+      <template>
+        <div class="hd log url">
+          <h2>新歌速递</h2>
+          <router-link :to="{name:'moreList',query:{title:'新歌速递',url:'/album/newest'}}" v-slot="{navigate}">
+            <div @click="navigate" role="link">
+              更多
+            </div>
+          </router-link>
+        </div>
+        <div class="container">
+          <div class="gallery">
+            <div class="scroller">
+              <div class="card url" v-for="(item,index) in NewsMusic.slice(0,3)" :key="index">
+                <router-link :to="{name:'musicPlay2',query: {musicId:item.id}}" custom v-slot="{navigate}">
+                  <div class="album" @click="navigate" role="link">
+                    <img :src="item.picUrl" alt="item.name">
+                    <div class="name">{{item.name}}</div>
+                    <div class="author">{{item.artist.name}}</div>
+                  </div>
+                </router-link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </template>
+    </el-skeleton>
   </div>
 </template>
 
@@ -35,14 +50,19 @@
     name: "NewsMusic",
     data(){
       return{
-        NewsMusic: []
+        NewsMusic: [],
+        loading:false
       }
     },
     mounted(){
+      this.loading = true
       const url = "/album/newest";
       axios.get(url).then(res=>{
         // console.log('new',res.data.albums)
         this.NewsMusic = res.data.albums
+        setTimeout(() => {
+          this.loading = false;
+        },1000);
       },2000).catch(error =>{
         console.log(error)
       })
