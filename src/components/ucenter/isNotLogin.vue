@@ -18,9 +18,17 @@
         </div>
         <div class="info-card">
           <div class="info-name">
-            <div class="nickName" @click="pushLogin">
+            <div class="nickName" @click="openLogin">
               立即登录<i class="el-icon-arrow-right"></i>
             </div>
+
+            <mu-dialog :title="title" width="600" max-width="90%" style="border-radius:10px"
+                       :esc-press-close="false" :overlay-close="false" :open.sync="openAlert"
+            >
+              <component @change="changeComp" @closeAlert="closeAlertDialog" :is="comp"></component>
+              <mu-button slot="actions" flat color="primary"  @click="closeAlertDialog">{{actions}}</mu-button>
+            </mu-dialog>
+
           </div>
         </div>
       </el-card>
@@ -67,27 +75,43 @@
 
 <script>
   import {mapState} from 'vuex'
+  import login from "../login && regist/login";
+  import register from "../login && regist/register";
+  import resetPassword from "../login && regist/resetPassword";
   export default {
     name: "isNotLogin",
     data () {
       return {
         musicSheet: [],
         activeIndex: "1",
+        openAlert: false,
+        title: "登录",
+        comp: "login",
+        actions: "暂不登录",
       };
     },
-
+    components: {
+      login,
+      register,
+      resetPassword
+    },
     mounted () {
 
     },
     methods:{
-      pushLogin () {
-        this.$message("正在跳转登录页");
-        setTimeout(() => {
-          this.$router.push("/loginPage/login");
-        }, 1000);
+      openLogin () {
+        this.openAlert = true
       },
-      handleSelect(key, keyPath) {
+      closeAlertDialog  () {
+        this.openAlert = false;
+      },
+      handleSelect (key, keyPath) {
         console.log(key, keyPath);
+      },
+      changeComp(component,title,actions){
+        this.comp = component
+        this.title = title
+        this.actions = actions
       }
     }
   };
@@ -191,5 +215,11 @@
      margin: 0;
      border-bottom: 2px solid transparent;
      color: #909399;
+  }
+
+</style>
+<style>
+  .mu-dialog{
+    border-radius: 10px;
   }
 </style>

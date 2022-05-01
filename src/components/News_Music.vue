@@ -27,13 +27,11 @@
           <div class="gallery">
             <div class="scroller">
               <div class="card url" v-for="(item,index) in NewsMusic.slice(0,3)" :key="index">
-                <router-link :to="{name:'musicPlay2',query: {musicId:item.id}}" custom v-slot="{navigate}">
-                  <div class="album" @click="navigate" role="link">
-                    <img :src="item.picUrl" alt="item.name">
-                    <div class="name">{{item.name}}</div>
-                    <div class="author">{{item.artist.name}}</div>
-                  </div>
-                </router-link>
+                <div class="album" @click="play(index)" role="link">
+                  <img :src="item.picUrl" alt="item.name">
+                  <div class="name">{{item.name}}</div>
+                  <div class="author">{{item.artist.name}}</div>
+                </div>
               </div>
             </div>
           </div>
@@ -45,6 +43,7 @@
 
 <script>
   import axios from '../plugins/axios.js'
+  import router from "../router";
 
   export default {
     name: "NewsMusic",
@@ -69,18 +68,14 @@
 
     },
     methods:{
-      // getWangyi(){
-      //   axios({
-      //     url: '/playlist/hot',  /*热门歌单接口地址*/
-      //     method: 'post'
-      //   })
-      //     .then(res => {
-      //       console.log("我拿到的数据：", res.data.tags)
-      //     })
-      //     .catch(err => {
-      //       console.log(err)
-      //     })
-      // }
+      play (index) {
+        let arr = []
+        this.NewsMusic.forEach(item => {
+          arr.push(item.id)
+        });
+        this.$store.dispatch('setSong',{currentIndex:index,songIdList:arr})
+        router.push({ path: "/musicplay2"});
+      },
     }
   }
 </script>

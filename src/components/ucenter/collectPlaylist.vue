@@ -81,7 +81,7 @@
 
 <style scoped>
   .musicSheet-card{
-    width: 95%;
+    width: 100%;
     text-align: center;
     border-radius: 10px;
     margin-top: 10px;

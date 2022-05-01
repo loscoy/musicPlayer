@@ -1,70 +1,64 @@
 <template>
   <!--  今日推荐 - 更多-->
   <div class="more-list" v-if="this.$route.query.url === '/personalized/newsong'">
-    <div class="wrapper">
-      <vue-pull-refresh :on-refresh="onRefresh">
+    <div class="wrapper" ref="container">
+      <mu-load-more @refresh="refresh" :refreshing="refreshing">
         <h3>{{this.$route.query.title}}</h3>
         <div class="info url log" v-for="(item,index) in morelist" :key="index">
-          <router-link :to="{name:'musicPlay2',query:{musicId:item.id}}" custom v-slot="{navigate}">
-            <div @click="navigate" role="link">
-              <div class="poster">
-                <div class="img">
-                  <img :src="item.picUrl" :alt="item.name">
-                </div>
-              </div>
-              <div class="text-wrap">
-                <div class="name">{{item.name}}</div>
-                <div class="author">{{item.song.artists[0].name}}</div>
+          <div @click="play(index)">
+            <div class="poster">
+              <div class="img">
+                <img :src="item.picUrl" :alt="item.name">
               </div>
             </div>
-          </router-link>
+            <div class="text-wrap">
+              <div class="name">{{item.name}}</div>
+              <div class="author">{{item.song.artists[0].name}}</div>
+            </div>
+          </div>
         </div>
-      </vue-pull-refresh>
+      </mu-load-more>
     </div>
   </div>
   <!--  热门歌单 - 更多-->
   <div class="more-list" v-else-if="this.$route.query.url === '/artists?id=6452'">
-    <div class="wrapper">
-      <vue-pull-refresh :on-refresh="onRefresh">
+    <div class="wrapper" ref="container">
+      <mu-load-more @refresh="refresh" :refreshing="refreshing">
         <h3>{{this.$route.query.title}}</h3>
         <div class="info url log" v-for="(item,index) in morelist" :key="index">
-          <router-link :to="{name:'musicPlay2',query:{musicId:item.id}}" custom v-slot="{navigate}">
-            <div @click="navigate" role="link">
-              <div class="poster">
-                <div class="img">
-                  <img :src="item.al.picUrl" :alt="item.name">
-                </div>
-              </div>
-              <div class="text-wrap">
-                <div class="name">{{item.name}}</div>
+          <div @click="play(index)" role="link">
+            <div class="poster">
+              <div class="img">
+                <img :src="item.al.picUrl" :alt="item.name">
               </div>
             </div>
-          </router-link>
+            <div class="text-wrap">
+              <div class="name">{{item.name}}</div>
+            </div>
+          </div>
         </div>
-      </vue-pull-refresh>
+      </mu-load-more>
     </div>
   </div>
   <!--  新歌速递 - 更多-->
   <div class="more-list" v-else-if="this.$route.query.url === '/album/newest'">
-    <div class="wrapper">
-      <vue-pull-refresh :on-refresh="onRefresh">
+    <div class="wrapper" ref="container">
+      <mu-load-more @refresh="refresh" :refreshing="refreshing">
         <h3>{{this.$route.query.title}}</h3>
         <div class="info url log" v-for="(item,index) in morelist" :key="index">
-          <router-link :to="{name:'musicPlay2',query:{musicId:item.id}}" custom v-slot="{navigate}">
-            <div @click="navigate" role="link">
-              <div class="poster">
-                <div class="img">
-                 <img :src="item.picUrl" :alt="item.name">
-                </div>
-              </div>
-              <div class="text-wrap">
-                <div class="name">{{item.name}}</div>
-                <div class="author">{{item.artist.name}}</div>
+          <div @click="play(index)" role="link">
+            <div class="poster">
+              <div class="img">
+               <img :src="item.picUrl" :alt="item.name">
               </div>
             </div>
-          </router-link>
+            <div class="text-wrap">
+              <div class="name">{{item.name}}</div>
+              <div class="author">{{item.artist.name}}</div>
+            </div>
+          </div>
         </div>
-      </vue-pull-refresh>
+      </mu-load-more>
     </div>
   </div>
 </template>
@@ -72,6 +66,7 @@
 <script>
   import axios from "../plugins/axios";
   import vuepullrefresh from "vue-pull-refresh"
+  import router from "../router";
 
   export default {
     name: "moreList",//更多列表组件（热门歌单，今日推荐）
@@ -79,6 +74,7 @@
       return{
         morelist:[],
         offset: 10,
+        refreshing: false,
       }
     },
     components: {
@@ -89,7 +85,7 @@
         axios.get(this.$route.query.url).then(res=>{
           // console.log("1",res.data.result[0].song.artists[0].name)
           this.morelist = res.data.result
-        },2000).catch(error =>{
+        }).catch(error =>{
           console.log(error)
         })
       }
@@ -104,7 +100,7 @@
           })
           this.morelist = this.morelist.slice(0,10)
           // console.log("list",this.morelist)
-        },2000).catch(error =>{
+        }).catch(error =>{
           console.log(error)
         })
       }
@@ -113,61 +109,67 @@
           this.morelist = res.data.albums
           this.morelist = this.morelist.slice(0,10)
           // console.log("list",this.morelist)
-        },2000).catch(error =>{
+        }).catch(error =>{
           console.log(error)
         })
       }
-      console.log("api",this.$route.query.url)
+      // console.log("api",this.$route.query.url)
     },
     methods:{
-      onRefresh() {
-        const that = this
-        return new Promise(function (resolve, reject) {
-          setTimeout(() => {
-            if(that.$route.query.url === "/personalized/newsong"){
-              axios.get(that.$route.query.url).then(res=>{
-                console.log("1",res.data)
-                that.morelist = res.data.result;
-                that.morelist = that.morelist
-              },2000).catch(error =>{
-                console.log(error)
-              })
-            }
-            if (that.$route.query.url === "/artists?id=6452"){
-              axios.get(that.$route.query.url).then(res=>{
-                //过滤空项
-                that.morelist = res.data.hotSongs
-                that.morelist.forEach((item,index) => {
-                  if (!item.al.picUrl) {
-                    that.morelist.splice(index,1)
-                  }
-                })
-                that.morelist = that.morelist.slice(that.offset,that.offset + 10)
-                // console.log("2",that.offset,that.offset+10)
-                that.offset + 10 < res.data.hotSongs.length ? that.offset += 10 : console.log("无更多数据")
+      refresh () {
+        this.refreshing = true;
+        this.$refs.container.scrollTop = 0;
+        setTimeout(() => {
+          if (this.$route.query.url === "/personalized/newsong") {
+            axios.get(this.$route.query.url).then(res => {
+              console.log("1", res.data);
+              this.morelist = res.data.result;
+            }).catch(error => {
+              console.log(error);
+            });
+          }
+          if (this.$route.query.url === "/artists?id=6452") {
+            axios.get(this.$route.query.url).then(res => {
+              //过滤空项
+              this.morelist = res.data.hotSongs;
+              this.morelist.forEach((item, index) => {
+                if (!item.al.picUrl) {
+                  this.morelist.splice(index, 1);
+                }
+              });
+              this.morelist = this.morelist.slice(this.offset, this.offset + 10);
+              // console.log("2",this.offset,this.offset+10)
+              this.offset + 10 < res.data.hotSongs.length ? this.offset += 10 : console.log("无更多数据");
 
-                //数据迭代
-                // that.morelist = that.morelist.slice(that.offset,that.offset + 10)
-                // that.offset + 10 < res.data.hotSongs.length ? that.offset += 10 : console.log("无更多数据")
-                //数据累加
-                // that.morelist = res.data.hotSongs.slice(0,that.offset)
-                // that.morelist.length < 50 ? that.offset += 10 : console.log("无更多数据")
-              },2000).catch(error =>{
-                console.log(error)
-              })
-            }
-            if (that.$route.query.url === "/album/newest"){
-              axios.get(that.$route.query.url).then(res=>{
-                that.morelist = res.data.albums
-                that.morelist = that.morelist
-              },2000).catch(error =>{
-                console.log(error)
-              })
-            }
-            resolve()
-          }, 1000);
+              //数据迭代
+              // this.morelist = this.morelist.slice(this.offset,this.offset + 10)
+              // this.offset + 10 < res.data.hotSongs.length ? this.offset += 10 : console.log("无更多数据")
+              //数据累加
+              // this.morelist = res.data.hotSongs.slice(0,this.offset)
+              // this.morelist.length < 50 ? this.offset += 10 : console.log("无更多数据")
+            }).catch(error => {
+              console.log(error);
+            });
+          }
+          if (this.$route.query.url === "/album/newest") {
+            axios.get(this.$route.query.url).then(res => {
+              this.morelist = res.data.albums;
+            }).catch(error => {
+              console.log(error);
+            });
+          }
+
+          this.refreshing = false;
+        }, 1000);
+      },
+      play (index) {
+        let arr = []
+        this.morelist.forEach(item => {
+          arr.push(item.id)
         });
-      }
+        this.$store.dispatch('setSong',{currentIndex:index,songIdList:arr})
+        router.push({ path: "/musicplay2"});
+      },
     },
 
   }

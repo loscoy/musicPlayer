@@ -16,7 +16,7 @@
     </template>
 
     <template >
-      <div class="mod-albums" v-if="this.url === '/personalized/newsong'">
+      <el-card class="mod-albums" v-if="this.url === '/personalized/newsong'">
         <div class="hd log url">
           <h2>{{title}}</h2>
           <router-link :to="{ name:'moreList', query:{ url:url,title:title}}" custom v-slot="{ navigate }">
@@ -26,20 +26,18 @@
         <div class="container">
           <div class="gallery">
             <div class="scroller">
-                <div class="card url" v-for="(item,index) in todayRecommend.slice(0, 6)" :key="index">
-                  <router-link :to="{name:'musicPlay2',query:{musicId:item.id}}" custom v-slot="{navigate}">
-                    <div class="album" @click="navigate" @keypress.enter="navigate" role="link">
-                      <div class="img">
-                        <img :src="item.picUrl" :alt="item.name">
-                      </div>
-                      <div class="name">{{item.name}}</div>
-                    </div>
-                  </router-link>
+              <div class="card url" v-for="(item,index) in todayRecommend.slice(0, 6)" :key="index">
+                <div class="album" @click="play(index)">
+                  <div class="img">
+                    <img :src="item.picUrl" :alt="item.name">
+                  </div>
+                  <div class="name">{{item.name}}</div>
                 </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </el-card>
 
       <div class="mod-albums" v-else-if="this.url === '/artists?id=6452'">
         <div class="hd log url" >
@@ -52,14 +50,12 @@
           <div class="gallery">
             <div class="scroller">
               <div class="card url" v-for="(item,index) in todayRecommend" v-if="item.al.picUrl !== null && index <= 6" :key="index">
-                <router-link :to="{name:'musicPlay2',query:{musicId:item.id}}" custom v-slot="{navigate}">
-                  <div class="album" @click="navigate" @keypress.enter="navigate" role="link">
-                    <div class="img">
-                      <img :src="item.al.picUrl" :alt="item.name">
-                    </div>
-                    <div class="name">{{item.name}}</div>
+                <div class="album" @click="play(index)">
+                  <div class="img">
+                    <img :src="item.al.picUrl" :alt="item.name">
                   </div>
-                </router-link>
+                  <div class="name">{{item.name}}</div>
+                </div>
               </div>
             </div>
           </div>
@@ -71,6 +67,7 @@
 
 <script>
   import axios from '../plugins/axios.js'
+  import router from "../router";
 
   export default {
     name: "TodayRecommend",
@@ -96,14 +93,14 @@
         axios.get(this.url).then(res=>{
           this.todayRecommend = res.data.result
 
-        },2000).catch(error =>{
+        }).catch(error =>{
           console.log(error)
         })
       }
       if (this.url === "/artists?id=6452"){
         axios.get(this.url).then(res=>{
           this.todayRecommend = res.data.hotSongs
-        },2000).catch(error =>{
+        }).catch(error =>{
           console.log(error)
         })
       }
@@ -115,7 +112,14 @@
 
     },
     methods:{
-
+      play(index){
+        let arr = []
+        this.todayRecommend.forEach(item=>{
+          arr.push(item.id)
+        })
+        this.$store.dispatch('setSong',{currentIndex:index,songIdList:arr})
+        router.push({ path: "/musicplay2"});
+      }
     }
   }
 </script>
@@ -183,4 +187,9 @@
     margin-bottom: 2px;
   }
 
+</style>
+<style>
+  .mod-albums .el-card__body{
+    padding: 0;
+  }
 </style>

@@ -15,17 +15,16 @@
 
         <template #default>
           <div>
-            <div class="back" style="display: flex;align-items: center" @click="back">
-              <i class="el-icon-back" style="margin-right: 10px"></i>
-              <div>歌单</div>
-            </div>
+            <el-page-header @back="back">
+              <div style="font-size: 15px" slot="content">歌单</div>
+            </el-page-header>
             <div style="display: flex;">
               <div class="img" style="max-width: 33%;margin: 20px;overflow:hidden;border-radius: 10px">
-                <img :src="likeListSongs[0].al.picUrl">
+                <img :src="coverUrl">
               </div>
               <div style="margin:20px 20px 20px 0;text-align: left">
                 <div>{{playListName}}</div>
-                <div style="display: flex;margin-top: 20px;align-items:center;">
+                <div style="display: flex;margin-top: 20px;align-items:center;font-size: 15px;color: #999999">
                   <div style="border-radius: 50%;overflow:hidden;max-width: 20%;margin-right: 10px"><img :src="user.avatar"></div>
                   <div>{{user.nickname}}</div>
                   <div><i class="el-icon-arrow-right"></i> </div>
@@ -35,7 +34,7 @@
           </div>
           <div class="temp">
             <div>
-              <div v-for="(item,index) in likeListSongs" @click="playSelected(item.id)" :key="index" class="item">
+              <div v-for="(item,index) in ListSongs" @click="playSelected(index)" :key="index" class="item">
                 <div class="num">{{index+1}}</div>
                 <div>
                   <div class="name" style="font-size: 14px">{{item.name}}</div>
@@ -66,10 +65,11 @@
     data () {
       return {
         loading: false,
-        likeListSongs:[],
+        ListSongs:[],
         artist: [],
         user:{},
         playListName:'',
+        coverUrl:''
       };
     },
     computed: {
@@ -82,11 +82,11 @@
       let id = this.$route.query.id
       getPlaylistDetail(id).then(res=>{
         this.playListName = res.data.playlist.name
-        console.log(res.data);
+        // console.log(res.data);
       })
       getAllPlaylistMusic(id).then(res=>{
-        this.likeListSongs = res.data.songs
-        console.log(res.data);
+        this.ListSongs = res.data.songs
+        this.coverUrl = res.data.songs[0].al.picUrl
         this.handleArtist()
         setTimeout(()=>{
           this.loading = false
@@ -100,11 +100,16 @@
       });
     },
     methods: {
-      playSelected (musicId) {
-        router.push({ path: "/musicplay2", query: { musicId: musicId } });
+      playSelected (index) {
+        let arr = []
+        this.ListSongs.forEach(item => {
+          arr.push(item.id)
+        });
+        this.$store.dispatch('setSong',{currentIndex:index,songIdList:arr})
+        router.push({ path: "/musicplay2"});
       },
       handleArtist () {
-        this.likeListSongs.forEach(item => {
+        this.ListSongs.forEach(item => {
           let l = item.ar.length
           let s = ''
           if(l>1){
@@ -155,7 +160,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 10%;
+    width: 6%;
     color: #999;
     font-size: 15px;
     font-family: 'Helvetica Neue';

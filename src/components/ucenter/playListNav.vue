@@ -1,6 +1,6 @@
 <template>
   <div class="playListNav">
-    <el-menu :default-active="'1'" router class="playListNav" mode="horizontal"  style="border-radius:10px;text-align:center;width: 95%;margin: 10px 10px 0 10px;">
+    <el-menu :default-active="'1'" router class="playListNav" mode="horizontal"  style="border-radius:10px;text-align:center;width: 100%;margin: 10px 0;">
       <el-menu-item class="item" :index="item.id" v-for="item in routeInfo" :key="item.id" :route="{path:item.url}" style="width: 50%;">{{item.name}}</el-menu-item>
     </el-menu>
   </div>

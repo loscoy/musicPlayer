@@ -1,0 +1,189 @@
+<template>
+  <div class="musicController">
+    <div class="slider" style="width: 90%">
+      <mu-slider class="demo-slider" color="secondary" @change="moveSlider" v-model="schedule"></mu-slider>
+    </div>
+    <div class="controller">
+      <div class="buttons">
+        <div class="mode"><i class="icon icon-repeat"></i> </div>
+        <div class="button">
+          <div class="left"><i class="icon icon-skip-back" @click="preTrack"></i> </div>
+          <div class="center">
+            <i class="icon icon-play-circle" v-show="show" @click="play"></i>
+            <i class="icon icon-pause-circle" v-show="!show" @click="pause"></i>
+          </div>
+          <div class="right"><i class="icon icon-skip-forward" @click="nextTrack"></i> </div>
+        </div>
+        <div class="list" @click="showList"><i class="icon icon-list"></i> </div>
+        <mu-bottom-sheet :open.sync="open">
+          <mu-sub-header>播放列表
+            <div class="close" @click="open = false">
+              <i class="icon icon-x"></i>
+            </div>
+          </mu-sub-header>
+          <mu-list>
+            <div class="list">
+              <mu-list-item v-for="(item,index) in songList" :key="index">
+                <mu-list-item-action v-if="index === currentIndex">
+                  <i class="icon icon-bar-chart-2"></i>
+                </mu-list-item-action>
+                <mu-list-item-title @click="playItem(index)" :style="{'color':highLight(index)}">{{item}}</mu-list-item-title>
+                <mu-list-item-action>
+                  <i class="icon icon-trash"></i>
+                </mu-list-item-action>
+              </mu-list-item>
+            </div>
+          </mu-list>
+        </mu-bottom-sheet>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+  import { getDetailInfo } from "../Api/music";
+
+  export default {
+    name: "musicController",
+    data () {
+      return{
+        show: true,
+        schedule: 0,
+        open: false,
+        songList: [],
+        list:JSON.parse(sessionStorage.getItem('songIdList'))
+      }
+    },
+    props: {
+      durationTime:0,
+      currentTime:0,
+      songIdList:[]
+    },
+    watch: {
+      currentTime(val){
+        this.schedule =  Math.round((parseInt(val) / parseInt(this.durationTime))* 100)
+      }
+    },
+    computed: {
+      currentIndex () {
+        return this.$store.state.song.currentIndex;
+      },
+    },
+    mounted () {
+      this.getSongList()
+    },
+    methods: {
+      play () {
+        this.$emit("play");
+        this.show = false
+      },
+      pause () {
+        this.$emit("pause");
+        this.show = true;
+      },
+      moveSlider(val){
+        this.pause()
+        let result = (val/100) * this.durationTime
+        this.$emit('moveSlider',result)
+        this.play()
+      },
+      preTrack () {
+        this.$emit("preTrack");
+      },
+      nextTrack () {
+        this.$emit("nextTrack")
+      },
+      showList () {
+        this.open = true;
+      },
+      getSongList () {
+        let art = ''
+        let artArr = []
+        this.songList = []
+        this.songIdList.forEach(item => {
+          getDetailInfo(item).then(res => {
+            artArr = res.data.songs[0].ar
+            artArr.forEach((elem,index)=>{
+              if(index < artArr.length-1){
+                art = art + elem.name + ' / '
+              }else{
+                art = art + elem.name
+              }
+            })
+            this.songList.push(res.data.songs[0].name + ' - ' + art)
+            art = ''
+          });
+        });
+      },
+      highLight (index) {
+        if(index === this.currentIndex){
+          return 'red'
+        }else{
+          return ''
+        }
+      },
+      playItem(index){
+        this.pause()
+        this.$store.dispatch('setSong',{currentIndex:index,songIdList:this.list})
+        this.$emit("musicInit")
+        setTimeout(()=>{
+          this.play()
+        },500)
+      }
+    },
+  };
+</script>
+
+<style scoped>
+  .musicController{
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 70px;
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .controller{
+    display: flex;
+    width: 100%;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+  .mu-secondary-text-color{
+    margin: 0;
+  }
+  .buttons{
+    width: 100%;
+    font-size: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .button {
+    font-size: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .button .center{
+    display: flex;
+    font-size: 40px;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+  .list{
+    overflow: auto;
+  }
+  .mu-list{
+    height: 400px;
+  }
+  .close{
+    display: inline-block;
+    float: right;
+    margin-right: 10px;
+    font-size: 20px;
+  }
+</style>

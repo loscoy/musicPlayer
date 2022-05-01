@@ -1,7 +1,7 @@
 <template>
-  <div class="home" v-if="active">
-    <vue-pull-refresh :on-refresh="onRefresh">
-      <banner></banner>
+  <div class="home" ref="container" v-if="active">
+    <mu-load-more @refresh="refresh" :refreshing="refreshing">
+      <banner class="banner"></banner>
       <todayRecommend></todayRecommend>
       <NewsMusic></NewsMusic>
       <musicListNav></musicListNav>
@@ -10,7 +10,7 @@
         <router-view></router-view>
       </keep-alive>
       <todayRecommend title="热门歌单" url="/artists?id=6452"></todayRecommend>
-    </vue-pull-refresh>
+    </mu-load-more>
   </div>
 </template>
 
@@ -20,8 +20,6 @@
   import NewsMusic from "../components/News_Music";
   import banner from "../components/Banner";
   import musicListNav from "./musicLists/musicListNav";
-  import vuepullrefresh from "vue-pull-refresh";
-  import Vue from 'vue'
 
   export default {
     name: "home",
@@ -30,30 +28,31 @@
       NewsMusic,
       banner,
       musicListNav,
-      'vue-pull-refresh': vuepullrefresh
     },
     data(){
       return{
-        active:true
+        active:true,
+        refreshing: false,
       }
     },
     methods:{
-      onRefresh() {
-        const that = this
-        return new Promise(function (resolve, reject) {
-          setTimeout(() => {
-            that.active = false
-            that.$nextTick(()=>{
-              that.active = true
-            })
-            resolve()
-          },1000)
-        })
-      }
+      refresh () {
+        this.refreshing = true;
+        this.$refs.container.scrollTop = 0;
+        setTimeout(() => {
+          this.refreshing = false;
+          this.active = false
+          this.$nextTick(() => {
+            this.active = true
+          });
+        }, 1000)
+      },
     }
   }
 </script>
 
 <style scoped>
-
+  .home{
+    z-index: -1;
+  }
 </style>

@@ -5,19 +5,22 @@
     </div>
     <el-skeleton style="width:100%;text-align: center;padding-top: 5px;" :loading="loading" animated><!--:throttle="1000"-->
       <template slot="template">
-        <el-card :body-style="{ padding: '5px', marginBottom: '1px' }">
-          <div
-                  style="display: flex; align-items: center; justify-content: space-between;margin: 10px;height: 20px"
-                  v-for="i in 10" :key="i"
-          >
-            <el-skeleton-item variant="text" style="margin:10px;width: 50%" />
-            <el-skeleton-item variant="text" style="width: 50%;margin: 10px" />
-          </div>
-        </el-card>
+        <div class="hotCard">
+          <el-card :body-style="{ padding: '5px', marginBottom: '1px' }">
+            <div
+                    style="display: flex; align-items: center; justify-content: space-between;margin: 10px;height: 20px"
+                    v-for="i in 10" :key="i"
+            >
+              <el-skeleton-item variant="text" style="margin:10px;width: 50%" />
+              <el-skeleton-item variant="text" style="width: 50%;margin: 10px" />
+            </div>
+          </el-card>
+        </div>
       </template>
       <template #default>
-        <el-card :body-style="{ padding: '5px', marginBottom: '1px' }">
-          <div class="container">
+        <div class="hotCard">
+          <el-card :body-style="{ padding: '5px', marginBottom: '1px' ,}">
+            <div class="container">
               <div class="info" v-for="(item,index) in hotSearchData" @click="search(item.searchWord)" :key="index">
                 <div class="text">
                   <div class="i">{{index+1}}</div>
@@ -25,8 +28,9 @@
                   <div class="image" v-if="item.iconUrl !== 0"><img :src="item.iconUrl"></div>
                 </div>
               </div>
-          </div>
-        </el-card>
+            </div>
+          </el-card>
+        </div>
       </template>
     </el-skeleton>
   </div>
@@ -67,10 +71,7 @@
 
   .hotSearch{
     text-align: center;
-    position: relative;
-    width: 95%;
-    /*display:flex;*/
-    margin-top: 15px;
+    width: 100%;
   }
   .hotSearch .title{
     width: 100%;
@@ -99,6 +100,7 @@
     margin-top: 4px;
     line-height: 14px;
     max-height: 28px;
+    max-width: 100%;
     margin-bottom: 2px;
     display: flex;
   }
@@ -109,18 +111,24 @@
   }
   .w{
     margin-right: 5px;
+    max-width: 60%  ;
+    overflow: hidden;
   }
   .image{
     align-items: center;
+    max-width: 20%;
+    overflow: hidden;
   }
   img {
-    max-width: 25%;
-    height: auto;
+    max-width:40%;
   }
  /*.container div:active{*/
 
  /*   background-color:black;*/
 
  /* }*/
-
+  .el-card{
+    border-radius: 10px;
+  }
 </style>
+

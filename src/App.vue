@@ -76,6 +76,9 @@ export default {
   li,ol{
     list-style: none;
   }
+  html,body {
+    height: 100%;
+  }
   html{
     font-size: 16px;
   }
@@ -95,8 +98,8 @@ export default {
   }
   body{
     margin: 0 0 0 0;
-    /*max-width: 640px;*/
-    /*min-width: 320px;*/
+    max-width: 640px;
+    min-width: 320px;
     color: #555;
     background: #f9f9f9;
     height: 100%;

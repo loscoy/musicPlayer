@@ -4,8 +4,8 @@
 > 完善ing...
 >
 > banner --> swiper
-> 下拉刷新 --> **[ vue-pull-refresh](https://github.com/lakb248/vue-pull-refresh)**
-> api -->**[ NeteaseCloudMusicApi](https://github.com/Binaryify/NeteaseCloudMusicApi)**
+> 下拉刷新 --> **[Muse-UI](https://muse-ui.org/)**
+> API -->**[ NeteaseCloudMusicApi](https://github.com/Binaryify/NeteaseCloudMusicApi)**
 > 歌词处理-->lyric-parser
 
 ## Build Setup

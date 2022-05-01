@@ -2,7 +2,6 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Index from '@/pages/index'
 import Home from '@/pages/home'
-import Artist from '@/pages/artist'
 import topList from '@/pages/topList'
 import Search from '@/pages/search'
 import Ucenter from '@/pages/ucenter'
@@ -63,8 +62,8 @@ const router = new Router({
           ],
         },
         {
-          path: "artist",
-          component: Artist,
+          path: "cloud",
+          component: () => import("@/pages/cloud"),
         },
         {
           path: "toplist",
@@ -98,6 +97,10 @@ const router = new Router({
           name: "moreList",
           component: () => import("@/pages/moreList"),
         },
+        {
+          path:'userDetail',
+          component: () => import('@/pages/userDetail')
+        }
       ],
     },
   ],

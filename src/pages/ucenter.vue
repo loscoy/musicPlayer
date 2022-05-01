@@ -2,8 +2,10 @@
   <div class="ucenter">
     <is-login v-if="uid"></is-login>
     <is-not-login v-if="!uid"></is-not-login>
-    <play-list-nav></play-list-nav>
-    <router-view></router-view>
+    <play-list-nav v-if="uid"></play-list-nav>
+    <keep-alive>
+      <router-view></router-view>
+    </keep-alive>
   </div>
 </template>
 
@@ -26,6 +28,11 @@
         uid:state => state.user.id,
       }),
     },
+    watch:{
+      uid(newVal,oldVal){
+        console.log(newVal,oldVal);
+      }
+    }
   }
 </script>
 

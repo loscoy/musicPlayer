@@ -170,7 +170,7 @@
   }
   .hot{
     width: 100%;
-    margin: 10px 10px 0 10px;
+    margin: 20px 0;
     text-align: center;
   }
 

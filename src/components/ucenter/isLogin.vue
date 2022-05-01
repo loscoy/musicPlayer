@@ -1,15 +1,10 @@
 <template>
-  <div class="isLogin" >
+  <div class="isLogin">
     <div class="user-list-info">
       <el-card class="top-card">
         <div class="tx">
-          <div class="avatar">
-            <el-image
-                    style="width: 50px; height: 50px"
-                    :src="userInfo.avatarUrl"
-                    fit="fill"
-                    alt="头像"
-            >
+          <div class="avatar" @click="userDetail">
+            <el-image style="width: 50px; height: 50px" :src="userInfo.avatarUrl" fit="fill" alt="头像">
               <div slot="error" class="image-slot">
                 <i class="el-icon-picture-outline"></i>
               </div>
@@ -18,7 +13,7 @@
         </div>
         <div class="info-card">
           <div class="info-name">
-            <div class="nickName">
+            <div class="nickName" @click="userDetail">
               {{userInfo.nickname}}
             </div>
             <div class="info-else">
@@ -35,12 +30,8 @@
       <el-card class="music-like" body-style="padding:10px">
         <div @click="getDetail(likePlaylist.id)">
           <div class="like-cover">
-            <el-image
-                    style="width: 50px; height: 50px;border-radius: 10px"
-                    :src="likePlaylist.coverImgUrl"
-                    fit="fill"
-                    alt="cover"
-            >
+            <el-image style="width: 50px; height: 50px;border-radius: 10px" :src="likePlaylist.coverImgUrl" fit="fill"
+              alt="cover">
               <div slot="error" class="image-slot">
                 <i class="el-icon-picture-outline"></i>
               </div>
@@ -62,133 +53,137 @@
 </template>
 
 <script>
-  import { getMusicSheet, getUserInfo } from "../../Api/user";
-  import {mapState} from 'vuex'
-  import { getPlaylistDetail } from "../../Api/music";
-  import router from "../../router";
-  export default {
-    name: "isLogin",
-    data () {
-      return {
-        userInfo: [],
-        musicSheet:[],
-      };
-    },
-    computed: {
-      ...mapState({
-        uid:state => state.user.id,
-        token:state => state.user.token
-      }),
-      likePlaylist(){
-        return this.musicSheet[0]
-      }
-    },
-    mounted () {
-      if (this.uid){
-        // console.log(this.uid+','+this.token);
-        this.getInfo()
-      }
-    },
-    methods: {
-      getInfo () {
-        getUserInfo(this.uid).then(res => {
-          this.userInfo = {
-            avatarUrl: res.data.profile.avatarUrl,
-            nickname: res.data.profile.nickname,
-            follows: res.data.profile.follows,
-            followeds: res.data.profile.followeds,
-            level: res.data.level,
-          };
-        });
-        getMusicSheet(this.uid).then(res => {
-          this.musicSheet = res.data.playlist;
-        });
-      },
-      getDetail (playlistId) {
-        router.push({ path: "/Umlist",query:{id:playlistId}})
-      },
+import { getMusicSheet, getUserInfo } from "../../Api/user";
+import { mapState } from 'vuex'
+import { getPlaylistDetail } from "../../Api/music";
+import router from "../../router";
+export default {
+  name: "isLogin",
+  data () {
+    return {
+      userInfo: [],
+      likePlaylist: {},
+    };
+  },
+  computed: {
+    ...mapState({
+      uid: state => state.user.id
+    }),
+  },
+  mounted () {
+    if (this.uid) {
+      // console.log(this.uid+','+this.token);
+      this.getInfo()
     }
-  };
+  },
+  methods: {
+    getInfo () {
+      getUserInfo(this.uid).then(res => {
+        this.userInfo = {
+          avatarUrl: res.data.profile.avatarUrl,
+          nickname: res.data.profile.nickname,
+          follows: res.data.profile.follows,
+          followeds: res.data.profile.followeds,
+          level: res.data.level,
+        };
+      });
+      getMusicSheet(this.uid).then(res => {
+        this.likePlaylist = {
+          name: res.data.playlist[0].name,
+          trackCount: res.data.playlist[0].trackCount,
+          playCount: res.data.playlist[0].playCount,
+          coverImgUrl: res.data.playlist[0].coverImgUrl,
+          id: res.data.playlist[0].id,
+        }
+      });
+    },
+    getDetail (playlistId) {
+      router.push({ path: "/Umlist", query: { id: playlistId } })
+    },
+    userDetail () {
+      router.push('/userDetail')
+    }
+  }
+};
 </script>
 
 <style scoped>
-  .user-list-info{
-    display: flex;
-    flex-wrap:wrap;
-    justify-content: center;
-  }
-  .avatar{
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    margin: 55px auto;
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    overflow: hidden;
-  }
-  .top-card{
-    width: 95%;
-    text-align: center;
-    height: 90px;
-    margin-top: 30px;
-    border-radius: 10px;
-  }
-  .music-like{
-    width: 95%;
-    height: 70px;
-    border-radius: 10px;
-    margin-top: 10px;
-  }
+.user-list-info {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.avatar {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: 55px auto;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  overflow: hidden;
+}
+.top-card {
+  width: 100%;
+  text-align: center;
+  height: 90px;
+  margin-top: 30px;
+  border-radius: 10px;
+}
+.music-like {
+  width: 100%;
+  height: 70px;
+  border-radius: 10px;
+  margin-top: 10px;
+}
 
-  .tx{
-    text-align: center;
-  }
-  .nickName{
-    position: relative;
-    font-weight: bold;
-  }
-  .info-card{
-    height: 55px;
-    margin-top: 15px;
-  }
-  .info-name{
-    display: flex;
-    flex-wrap:wrap;
-    justify-content: center;
-  }
-  .nickName{
-    width: 100%;
-  }
-  .info-else{
-    display: flex;
-    align-items: center;
-    font-size: 10px;
-    color: #999999;
-    height: 25px;
-  }
+.tx {
+  text-align: center;
+}
+.nickName {
+  position: relative;
+  font-weight: bold;
+}
+.info-card {
+  height: 55px;
+  margin-top: 15px;
+}
+.info-name {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.nickName {
+  width: 100%;
+}
+.info-else {
+  display: flex;
+  align-items: center;
+  font-size: 10px;
+  color: #999999;
+  height: 25px;
+}
 
-  .like-cover{
-    width: 15%;
-    float: left;
-  }
-  .like-describe{
-    float: right;
-    width: 80%;
-    margin-top: 8px;
-  }
-  .like-info{
-    color: #999;
-    display: flex;
-    font-size: 10px;
-  }
-  .like-name{
-    font-size: 14px;
-  }
-  .counter{
-    margin-left: 20px;
-  }
-
+.like-cover {
+  width: 15%;
+  float: left;
+}
+.like-describe {
+  float: right;
+  width: 80%;
+  margin-top: 8px;
+}
+.like-info {
+  color: #999;
+  display: flex;
+  font-size: 10px;
+}
+.like-name {
+  font-size: 14px;
+}
+.counter {
+  margin-left: 20px;
+}
 </style>

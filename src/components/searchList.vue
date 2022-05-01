@@ -1,6 +1,6 @@
 <template>
   <div class="searchList">
-    <el-card class="box-card" :body-style="{'height':showall}">
+    <el-card class="box-card">
       <div slot="header" class="clearfix">
         <span>单曲</span>
       </div>
@@ -27,9 +27,6 @@
               </div>
               <div style="font-size: 14px">无更多数据</div>
             </div>
-            <div class="showMore" v-if="showall==='470px'" @click="showAll">
-              <el-card body-style="padding:0;width:100%">查看更多</el-card>
-            </div>
           </div>
         </template>
       </el-skeleton>
@@ -49,7 +46,6 @@
         musicInfo:[],
         artistName:'',
         loading:false,
-        showall:'470px'
       }
     },
     props:{
@@ -78,9 +74,6 @@
             },
           });
       },
-      showAll () {
-        this.showall = '100%'
-      },
     },
   }
 </script>
@@ -89,7 +82,7 @@
   .searchList{
     text-align: center;
     position: relative;
-    width: 95%;
+    width: 100%;
     display:flex;
     flex-wrap: wrap;
     justify-content: center;
@@ -126,10 +119,15 @@
   }
   .showMore{
     position: absolute;
-    top: 560px;
+    top: 520px;
     left: 0;
     right: 0;
     width: 100%;
     height: 30px;
   }
+  .el-card{
+    border-radius: 10px;
+  }
+
 </style>
+

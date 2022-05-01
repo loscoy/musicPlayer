@@ -2,9 +2,10 @@
   <div class="play">
     <div class="header">
       <div class="title">
-        <router-link to="">
-          <i class="iconfont icon-shouye left" @click="back"></i>
-        </router-link>
+        <div style="font-size: 30px">
+          <i class="el-icon-back" @click="back"></i>
+<!--          <i  ></i>-->
+        </div>
         <div class="music-info">
           <p>{{musicInfo.name}}</p>
           <p class="author">{{artistName}}</p>
@@ -17,7 +18,7 @@
 
     <div class="song-info">
       <div class="song-info-img">
-        <img :src="musicInfo.al.picUrl" :alt="musicName">
+        <img :src="musicInfo.picUrl" alt="musicName">
         <div class="song-lrc">
 <!--          <LRC2 :currentLyric="currentLyric" :currentLyricNum="currentLyricNum" :lrcId="parseInt(musicId)"></LRC2>-->
           <ul ref="ul" class="content">
@@ -29,13 +30,25 @@
       </div>
 
       <div class="iconbox">
-        <i @click="collectHandler" :class={ca:collectAction} class="iconfont icon-shoucang2 left"></i>
+        <i @click="collectHandler" class="iconfont icon-shoucang2 left"></i>
         <i class="box"></i>
         <i class="iconfont icon-xiazai right"></i>
       </div>
     </div>
     <div class="song">
-      <audio ref="player" :src="musicUrl" controls></audio>
+      <music-controller
+              ref="ctl"
+              @moveSlider="moveSlider"
+              @play="play"
+              @pause="pause"
+              @nextTrack="nextTrack"
+              @preTrack="preTrack"
+              @musicInit="musicInit"
+              :currentTime="currentTime"
+              :durationTime="durationTime"
+              :songIdList="songIdList"
+      ></music-controller>
+      <audio v-show="false" @timeupdate="updateTime" ref="player" :src="musicUrl" controls></audio>
     </div>
   </div>
 </template>
@@ -47,7 +60,8 @@
   import iconfont from "@/assets/font/iconfont.css"
   import Lyric from 'lyric-parser'
   import { getDetailInfo, getLyric, getMusicUrl } from "../Api/music";
-  // import LRC from "../components/LRC";
+  import musicController from "../components/musicController";
+  import { mapActions, mapState } from "vuex";
 
   const LRC2 = Vue.component("lrc",(resolve)=>require(["../components/LRC2"],resolve))
 
@@ -55,9 +69,7 @@
     name: "musicPlay",
     data(){
       return{
-        musicId: this.$route.query.musicId,
         musicUrl: '',
-        currentTime:0,
         currentLyric:{},
         lyric: '',
         currentLyricNum:0,
@@ -67,122 +79,126 @@
         Cpos: 3,
         offset: -32,
         lrcLength:0,
+        currentTime:0,
+        durationTime:0
       }
     },
     components:{
       LRC2,
+      musicController
+    },
+    computed:{
+      ...mapState({
+        currentIndex:state => state.song.currentIndex,
+        songIdList:state => state.song.songIdList,
+      }),
+      musicId(){
+        return this.songIdList[this.currentIndex]
+      },
+    },
+    watch: {
     },
     created() {
-
-    },
-    mounted() {
-      this.getLyric(this.musicId)
-      getMusicUrl(this.musicId).then(res=>{
-        this.musicUrl = res.data.data[0].url
-      })
-      getDetailInfo(this.musicId).then(res => {
-        this.musicInfo = res.data.songs[0];
-        this.handleArtist()
-      });
-      const music = this.$refs.player  // 音频所在对象
-      music.addEventListener('timeupdate', () => {
-        if(this.lineNo===this.lrcLength)
-          return;
-        const curTime = music.currentTime; //播放器时间
-        if(this.currentLyric.lines[this.lineNo].time <= curTime * 1000){
-          this.lineHigh();//高亮当前行
-          this.lineNo++;
-        }
-      })
-      music.addEventListener('ended', () => {
-        this.goback(); //回滚歌词
-        music.play()
-      })
-    },
-    beforeDestroyed:{
-      removeEventListeners(){
-        const music = this.$refs.player  // 音频所在对象
-        music.removeEventListener('timeupdate', () => {
-          if(this.lineNo===this.lrcLength)
-            return;
-          const curTime = music.currentTime; //播放器时间
-          if(this.currentLyric.lines[this.lineNo].time <= curTime * 1000){
-            this.lineHigh();//高亮当前行
-            this.lineNo++;
-          }
-        })
-        music.removeEventListener('ended', () => {
-          this.goback(); //回滚歌词
-          music.play()
-        })
-      },
+      this.musicInit()
     },
     methods: {
+      ...mapActions(['addIndex','subIndex']),
+      musicInit(){
+        this.getLyric(this.musicId)
+        getMusicUrl(this.musicId).then(res=>{
+          this.musicUrl = res.data.data[0].url
+          const music = this.$refs.player
+          setTimeout(()=>{
+            this.durationTime = music.duration
+            music.addEventListener('timeupdate', () => {
+              if(this.lineNo===this.lrcLength)
+                return;
+              const curTime = music.currentTime; //播放器时间
+              if(this.currentLyric.lines[this.lineNo].time <= curTime * 1000){
+                this.lineHigh();//高亮当前行
+                this.lineNo++;
+              }
+            })
+            music.addEventListener('ended', () => {
+              this.goback(); //回滚歌词
+              this.nextTrack() //下一曲
+            })
+          },500)
+        })
+
+        getDetailInfo(this.musicId).then(res => {
+          this.musicInfo = {
+            name:res.data.songs[0].name,
+            picUrl:res.data.songs[0].al.picUrl
+          };
+          this.handleArtist(res.data.songs[0])
+        });
+      },
       // 异步获取歌词
-      async getLyric(id) {
+      async getLyric (id) {
         try {
-          let res = await getLyric(id)
-          this.lyric = res.data.lrc.lyric
-          this.currentLyric = new Lyric(this.lyric, this.lyricHandle)
-          this.lrcLength = this.currentLyric.lines.length
+          let res = await getLyric(id);
+          this.lyric = res.data.lrc.lyric;
+          this.currentLyric = new Lyric(this.lyric, this.lyricHandle);
+          this.lrcLength = this.currentLyric.lines.length;
         } catch (error) {
-          console.log(error)
+          console.log(error);
         }
       },
 
-      collectHandler() {
+      collectHandler () {
 
       },
-      collectAction() {
+      collectAction () {
 
       },
 
-      lyricHandle({ lineNum, txt }) {
+      lyricHandle ({ lineNum, txt }) {
 
       },
-      handleArtist () {
-        let l = this.musicInfo.ar.length;
+      handleArtist (musicInfo) {
+        let l = musicInfo.ar.length;
         let s = "";
         if (l > 1) {
           for (let i = 0; i < l; i++) {
             if (i + 1 < l) {
-              s = s.concat(this.musicInfo.ar[i].name + " / ");
+              s = s.concat(musicInfo.ar[i].name + " / ");
             } else {
-              s = s.concat(this.musicInfo.ar[i].name);
+              s = s.concat(musicInfo.ar[i].name);
             }
           }
           this.artistName = s;
         } else {
-          this.artistName = this.musicInfo.ar[0].name;
+          this.artistName = musicInfo.ar[0].name;
         }
       },
       //点击播放
-      playThis(index) {
-        const music = this.$refs.player
-        const ulist = this.$refs.ul
+      playThis (index) {
+        const music = this.$refs.player;
+        const ulist = this.$refs.ul;
         const list = ulist.getElementsByTagName("li");
 
         // 删除之前的高亮样式与设置当前点击部分高亮样式
-        list[this.lineNo-1].removeAttribute("class");//去掉上一行的高亮样式
-        this.lineNo = index
+        list[this.lineNo - 1].removeAttribute("class");//去掉上一行的高亮样式
+        this.lineNo = index;
         list[this.lineNo].className = "lineHigh";//高亮显示当前行
 
         // 将所点歌词时间赋给播放时间
-        music.currentTime = (this.currentLyric.lines[this.lineNo].time) / 1000
+        music.currentTime = (this.currentLyric.lines[this.lineNo].time) / 1000;
       },
 
       // 高亮歌词滚动事件
-      lineHigh() {
-        const ulist = this.$refs.ul
+      lineHigh () {
+        const ulist = this.$refs.ul;
         const list = ulist.getElementsByTagName("li");
-        if(this.lineNo>0){
-          list[this.lineNo-1].removeAttribute("class");//去掉上一行的高亮样式
+        if (this.lineNo > 0) {
+          list[this.lineNo - 1].removeAttribute("class");//去掉上一行的高亮样式
         }
         list[this.lineNo].className = "lineHigh";//高亮显示当前行
         //滚动至指定元素
         const element = document.getElementById(this.lineNo);
         // console.log('id',element,this.lineNo)
-        element.scrollIntoView({behavior: "smooth", block: "center"});
+        element.scrollIntoView({ behavior: "smooth", block: "center" });
 
         // 文字滚动 此方法已弃用
         /*if(this.lineNo > this.Cpos){
@@ -190,16 +206,48 @@
         }*/
       },
       // 歌词重置
-      goback() {
-        const ulist = this.$refs.ul
+      goback () {
+        const ulist = this.$refs.ul;
         document.querySelector(".lineHigh").removeAttribute("class");
         ulist.style.transform = "translateY(0)";
         this.lineNo = 0; //lineNo清零，重新播放
       },
-      back(){
+      updateTime (e) {
+        this.currentTime = e.target.currentTime;  //获取audio当前播放时间
+      },
+      back () {
         this.$router.go(-1);
+      },
+      play () {
+        this.$refs.player.play();
+      },
+      pause () {
+        this.$refs.player.pause();
+      },
+      moveSlider (val) {
+        this.$refs.player.currentTime = val;
+      },
+      nextTrack () {
+        this.$store.dispatch('addIndex')
+        // this.currentIndex += 1
+        this.$refs.ctl.pause()
+        this.musicInit()
+        setTimeout(()=>{
+          this.$refs.ctl.play()
+        },1000)
+
+      },
+      preTrack(){
+        const that = this
+        that.subIndex('subIndex')
+        // this.currentIndex -= 1
+        this.$refs.ctl.pause()
+        this.musicInit()
+        setTimeout(()=>{
+          this.$refs.ctl.play()
+        },1000)
       }
-    }
+    },
   }
 </script>
 
@@ -255,7 +303,7 @@
   }
   li{
     font-size: 16px;
-    transition-duration: 1200ms;
+    transition-duration: 1000ms;
   }
   .iconbox{
     display: flex;
