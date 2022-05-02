@@ -98,8 +98,8 @@ const router = new Router({
           component: () => import("@/pages/moreList"),
         },
         {
-          path:'userDetail',
-          component: () => import('@/pages/userDetail')
+          path:'levelDetail',
+          component: () => import('@/pages/levelDetail')
         }
       ],
     },

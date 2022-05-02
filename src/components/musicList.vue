@@ -1,5 +1,5 @@
 <template>
-  <div class="border panels">
+  <div class="border panels border-0">
     <div class="panel hotsongs on">
       <ul class="list">
 

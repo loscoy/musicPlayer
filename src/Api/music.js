@@ -30,9 +30,9 @@ export function getSearchRecommend(keyWord) {
     method:"get"
   })
 }
-export function getDetailInfo(id) {
+export function getDetailInfo(...ids) {
   return api({
-    url:"/song/detail?ids=" + id,
+    url:"/song/detail?ids=" + ids,
     method:"get"
   })
 }

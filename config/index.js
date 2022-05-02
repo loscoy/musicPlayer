@@ -10,15 +10,7 @@ module.exports = {
     // Paths
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
-    proxyTable: {
-      "/baidu_music_api":{
-        target: "https://api.ghser.com/wyy",//http://tingapi.ting.baidu.com
-        changeOrigin:true,
-        pathRewrite:{
-          '^/baidu_music_api':''
-        }
-      }
-    },
+    
 
     // Various Dev Server settings
     host: 'localhost', // can be overwritten by process.env.HOST

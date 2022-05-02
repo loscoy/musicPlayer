@@ -1,5 +1,5 @@
 <template>
-  <div class="mod-albums">
+  <el-card class="mod-albums">
     <el-skeleton animated :loading="loading">
       <template #template>
         <div style="display: flex;flex-wrap: wrap;justify-content: center;width: 100%">
@@ -26,7 +26,7 @@
         <div class="container">
           <div class="gallery">
             <div class="scroller">
-              <div class="card url" v-for="(item,index) in NewsMusic.slice(0,3)" :key="index">
+              <div class="card url border-0" v-for="(item,index) in NewsMusic.slice(0,3)" :key="index">
                 <div class="album" @click="play(index)" role="link">
                   <img :src="item.picUrl" alt="item.name">
                   <div class="name">{{item.name}}</div>
@@ -38,7 +38,7 @@
         </div>
       </template>
     </el-skeleton>
-  </div>
+  </el-card>
 </template>
 
 <script>
