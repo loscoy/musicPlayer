@@ -9,7 +9,7 @@
         <!-- 保持数据缓存 -->
         <router-view></router-view>
       </keep-alive>
-      <todayRecommend title="热门歌单" url="/artists?id=6452"></todayRecommend>
+      <todayRecommend title="每日推荐" url="/recommend/songs"></todayRecommend>
     </mu-load-more>
   </div>
 </template>

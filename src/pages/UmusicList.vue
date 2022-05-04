@@ -58,7 +58,7 @@
   import { getAllPlaylistMusic, getPlaylistDetail } from "../Api/music";
   import router from "../router";
   import { getUserInfo } from "../Api/user";
-  import { mapState } from "vuex";
+  import { mapState,mapActions } from "vuex";
 
   export default {
     name: "UmusicList",
@@ -100,13 +100,14 @@
       });
     },
     methods: {
+      ...mapActions(['showMusicplay','setSong']),
       playSelected (index) {
         let arr = []
         this.ListSongs.forEach(item => {
           arr.push(item.id)
         });
-        this.$store.dispatch('setSong',{currentIndex:index,songIdList:arr})
-        router.push({ path: "/musicplay2"});
+        this.setSong({currentIndex:index,songIdList:arr})
+        this.showMusicplay()
       },
       handleArtist () {
         this.ListSongs.forEach(item => {

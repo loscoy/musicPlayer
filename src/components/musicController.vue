@@ -21,20 +21,21 @@
 							<i class="icon icon-x"></i>
 						</div>
 					</mu-sub-header>
-					<mu-list>
+					<ul>
 						<div class="list">
-							<mu-list-item v-for="(item,index) in songList" :key="index">
-								<mu-list-item-action v-if="index === currentIndex">
+							<li ref="playList" v-for="(item,index) in songList" :key="index">
+								<div class="icon-left" v-if="index === currentIndex">
 									<i class="icon icon-bar-chart-2"></i>
-								</mu-list-item-action>
-								<mu-list-item-title @click="playItem(index)" :style="{'color':highLight(index)}">{{item}}
-								</mu-list-item-title>
-								<mu-list-item-action>
+								</div>
+								<div class="content-center" @click="playItem(index)" :style="{'color':highLight(index)}">
+									{{item}}
+								</div>
+								<div class="icon-right">
 									<i class="icon icon-trash"></i>
-								</mu-list-item-action>
-							</mu-list-item>
+								</div>
+							</li>
 						</div>
-					</mu-list>
+					</ul>
 				</mu-bottom-sheet>
 			</div>
 		</div>
@@ -51,8 +52,7 @@
 				show: true,
 				schedule: 0,
 				open: false,
-				songList: [],
-				list: JSON.parse(sessionStorage.getItem('songIdList'))
+				songList: []
 			}
 		},
 		props: {
@@ -61,8 +61,13 @@
 			songIdList: []
 		},
 		watch: {
-			currentTime(val) {
-				this.schedule = Math.round((parseInt(val) / parseInt(this.durationTime)) * 100)
+			songIdList(val) {
+				this.getSongList()
+			},
+			currentTime(val, oval) {
+				if (val) {
+					this.schedule = Math.round((parseInt(val) / parseInt(this.durationTime)) * 100)
+				}
 			}
 		},
 		computed: {
@@ -96,6 +101,10 @@
 			},
 			showList() {
 				this.open = true
+				setTimeout(() => {
+					let playList = this.$refs.playList
+					playList[this.currentIndex].scrollIntoView({ behavior: 'smooth' })
+				}, 500)
 			},
 			getSongList() {
 				let songsArr = []
@@ -126,8 +135,15 @@
 				}
 			},
 			playItem(index) {
+				setTimeout(() => {
+					let playList = this.$refs.playList
+					playList[this.currentIndex].scrollIntoView({ behavior: 'smooth' })
+				}, 500)
 				this.pause()
-				this.$store.dispatch('setSong', { currentIndex: index, songIdList: this.list })
+				this.$store.dispatch('setSong', {
+					currentIndex: index,
+					songIdList: JSON.parse(sessionStorage.getItem('songIdList'))
+				})
 				this.$emit('musicInit')
 				setTimeout(() => {
 					this.play()
@@ -180,11 +196,23 @@
 	.list {
 		overflow: auto;
 	}
-	.mu-list {
+	ul {
 		height: 400px;
 	}
+	li {
+		padding: 5px 15px 5px 15px;
+		line-height: 30px;
+		display: flex;
+		justify-content: space-between;
+	}
+	.content-center {
+		text-overflow: ellipsis;
+		overflow: hidden;
+		white-space: nowrap;
+		width: 80%;
+	}
 	.close {
-		display: inline-block;
+		display: inline;
 		float: right;
 		margin-right: 10px;
 		font-size: 20px;

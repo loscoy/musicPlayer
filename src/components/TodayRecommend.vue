@@ -1,5 +1,5 @@
 <template>
-	<el-card  class="mod-albums">
+	<el-card class="mod-albums">
 		<el-skeleton animated :loading="loading">
 			<template #template>
 				<div style="display: flex;flex-wrap: wrap;justify-content: center;width: 100%">
@@ -40,7 +40,7 @@
 					</div>
 				</div>
 
-				<div v-else-if="this.url === '/artists?id=6452'">
+				<div v-else-if="this.url === '/recommend/songs'">
 					<div class="hd log url">
 						<h2>{{title}}</h2>
 						<router-link :to="{name:'moreList',query:{url:url,title:title}}" custom v-slot="{ navigate }">
@@ -50,8 +50,7 @@
 					<div class="container">
 						<div class="gallery">
 							<div class="scroller">
-								<div class="card url border-0" v-for="(item,index) in todayRecommend"
-									v-if="item.al.picUrl !== null && index <= 6" :key="index">
+								<div class="card url border-0" v-for="(item,index) in todayRecommend.slice(0,6)" :key="index">
 									<div class="album" @click="play(index)">
 										<div class="img">
 											<img :src="item.al.picUrl" :alt="item.name">
@@ -69,6 +68,8 @@
 </template>
 
 <script>
+	import { mapActions } from 'vuex'
+	import { TodayRecommendPlaylist, TodayRecommendSongs } from '../Api/music.js'
 	import axios from '../plugins/axios.js'
 	import router from '../router'
 
@@ -102,15 +103,10 @@
 						console.log(error)
 					})
 			}
-			if (this.url === '/artists?id=6452') {
-				axios
-					.get(this.url)
-					.then(res => {
-						this.todayRecommend = res.data.hotSongs
-					})
-					.catch(error => {
-						console.log(error)
-					})
+			if (this.url === '/recommend/songs') {
+				TodayRecommendSongs().then(res => {
+					this.todayRecommend = res.data.data.dailySongs
+				})
 			}
 			setTimeout(() => {
 				this.loading = false
@@ -118,13 +114,14 @@
 		},
 		computed: {},
 		methods: {
+			...mapActions(['showMusicplay', 'setSong']),
 			play(index) {
 				let arr = []
 				this.todayRecommend.forEach(item => {
 					arr.push(item.id)
 				})
-				this.$store.dispatch('setSong', { currentIndex: index, songIdList: arr })
-				router.push({ path: '/musicplay2' })
+				this.setSong({ currentIndex: index, songIdList: arr })
+				this.showMusicplay()
 			}
 		}
 	}

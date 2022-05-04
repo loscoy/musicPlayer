@@ -3,7 +3,7 @@
 		<div class="header">
 			<div class="title">
 				<div style="font-size: 30px">
-					<i class="el-icon-back" @click="back"></i>
+					<i class="el-icon-back" @click="hide"></i>
 					<!--          <i  ></i>-->
 				</div>
 				<div class="music-info">
@@ -40,7 +40,7 @@
 			<music-controller ref="ctl" @moveSlider="moveSlider" @play="play" @pause="pause" @nextTrack="nextTrack"
 				@preTrack="preTrack" @musicInit="musicInit" :currentTime="currentTime" :durationTime="durationTime"
 				:songIdList="songIdList"></music-controller>
-			<audio v-show="false" @canplay="canplay" @timeupdate="updateTime" ref="player" :src="musicUrl" controls></audio>
+			<audio class="audio" v-show="false" @canplay="canplay" @timeupdate="updateTime" ref="player" :src="musicUrl" controls></audio>
 		</div>
 	</div>
 </template>
@@ -50,7 +50,7 @@
 	import axios from '@/plugins/axios'
 	import iconfont from '@/assets/font/iconfont.css'
 	import Lyric from 'lyric-parser'
-	import { getDetailInfo, getLyric, getMusicUrl } from '../Api/music'
+	import { getDetailInfo, getLyric, getMusicUrl, getSQUrl } from '../Api/music'
 	import musicController from '../components/musicController'
 	import { mapActions, mapState } from 'vuex'
 
@@ -81,43 +81,64 @@
 		computed: {
 			...mapState({
 				currentIndex: state => state.song.currentIndex,
-				songIdList: state => state.song.songIdList
+				songIdList: state => state.song.songIdList,
+				musicPlayShow: state => state.musicPlayShow
 			}),
 			musicId() {
 				return this.songIdList[this.currentIndex]
 			}
 		},
-		watch: {},
+		watch: {
+			currentIndex(val, oval) {
+				this.musicInit()
+			},
+			songIdList(val) {
+				return val
+			}
+		},
 		created() {
 			this.musicInit()
 		},
 		methods: {
-			...mapActions(['addIndex', 'subIndex']),
+			...mapActions(['addIndex', 'subIndex', 'hideMusicplay']),
 			musicInit() {
+				this.lineNo = 0
 				this.getLyric(this.musicId)
-				getMusicUrl(this.musicId).then(res => {
-					this.musicUrl = res.data.data[0].url
-					const music = this.$refs.player
-					music.addEventListener('timeupdate', () => {
-						if (this.lineNo === this.lrcLength) return //当前行数与歌词数组长度相同时结束
-						const curTime = music.currentTime //播放器时间
-						if (this.currentLyric.lines[this.lineNo].time <= curTime * 1000) {
-							this.lineHigh() //歌词中的时间小于当前播放时间，高亮当前行
-							this.lineNo++
-						}
-					})
-					music.addEventListener('ended', () => {
-						this.goback() //回滚歌词
-						this.nextTrack() //下一曲
-					})
+				getSQUrl(this.musicId).then(res => {
+					if (res.data.data.code === 200) {
+						//如果存在则使用高品质播放链接
+						this.musicUrl = res.data.data.url
+						this.getPlayer()
+					} else {
+						//否则使用试听链接
+						getMusicUrl(this.musicId).then(res => {
+							this.musicUrl = res.data.data[0].url
+							this.getPlayer()
+						})
+					}
 				})
-
+			},
+			getPlayer() {
 				getDetailInfo(this.musicId).then(res => {
 					this.musicInfo = {
 						name: res.data.songs[0].name,
 						picUrl: res.data.songs[0].al.picUrl
 					}
 					this.handleArtist(res.data.songs[0])
+				})
+				const music = this.$refs.player
+				music.addEventListener('timeupdate', () => {
+					if (this.lineNo === this.lrcLength) return //当前行数与歌词数组长度相同时结束
+					const curTime = music.currentTime //播放器时间
+
+					if (this.currentLyric.lines[this.lineNo].time <= curTime * 1000) {
+						this.lineHigh(this.lineNo) //歌词中的时间小于当前播放时间，高亮当前行
+						this.lineNo += 1
+					}
+				})
+				music.addEventListener('ended', () => {
+					this.goback() //回滚歌词
+					this.nextTrack() //下一曲
 				})
 			},
 			// 获取并处理歌词
@@ -149,39 +170,38 @@
 					this.artistName = musicInfo.ar[0].name
 				}
 			},
-			//点击播放
+			//点击歌词播放
 			playThis(index) {
+				//获取DOM
 				const music = this.$refs.player
 				const ulist = this.$refs.ul
 				const list = ulist.getElementsByTagName('li')
 
-				// 删除之前的高亮样式与设置当前点击部分高亮样式
+				// 删除之前的高亮样式并设置当前点击部分高亮样式
 				list[this.lineNo - 1].removeAttribute('class') //去掉上一行的高亮样式
-				this.lineNo = index
+				this.lineNo = index //当前歌词行数为所点歌词行数
 				list[this.lineNo].className = 'lineHigh' //高亮显示当前行
 
 				// 将所点歌词时间赋给播放时间
 				music.currentTime = this.currentLyric.lines[this.lineNo].time / 1000
 			},
 
-			// 高亮歌词滚动事件
-			lineHigh() {
+			// 歌词高亮与滚动
+			lineHigh(lineNo) {
 				const ulist = this.$refs.ul
 				const list = ulist.getElementsByTagName('li')
-				if (this.lineNo > 0) {
-					list[this.lineNo - 1].removeAttribute('class') //去掉上一行的高亮样式
+				if (lineNo > 0) {
+					list[lineNo - 1].removeAttribute('class') //去掉上一行的高亮样式
 				}
-				list[this.lineNo].className = 'lineHigh' //高亮显示当前行
+				list[lineNo].className = 'lineHigh' //高亮显示当前行
 				//滚动至指定元素
-				const element = document.getElementById(this.lineNo)
-				// console.log('id',element,this.lineNo)
+				const element = document.getElementById(lineNo)
 				element.scrollIntoView({ behavior: 'smooth', block: 'center' }) // 当前播放的歌词滚动至中间
 			},
 			// 歌词重置
 			goback() {
 				const ulist = this.$refs.ul
 				document.querySelector('.lineHigh').removeAttribute('class')
-				ulist.style.transform = 'translateY(0)'
 				this.lineNo = 0 //lineNo清零，重新播放
 			},
 			updateTime(e) {
@@ -189,9 +209,12 @@
 			},
 			canplay(e) {
 				this.durationTime = e.target.duration //歌曲可播放时获取总时间
+				if (this.musicPlayShow) {
+					this.$refs.ctl.play()
+				}
 			},
-			back() {
-				this.$router.go(-1)
+			hide() {
+				this.hideMusicplay()
 			},
 			play() {
 				this.$refs.player.play()
@@ -199,22 +222,37 @@
 			pause() {
 				this.$refs.player.pause()
 			},
-			moveSlider(val) {
-				this.$refs.player.currentTime = val
+			//行数处理
+			currentNo(time) {
+				let length = 0
+				this.lineNo = 0
+				length = this.currentLyric.lines.length
+				for (let i = 0; i < length; i++) {
+					if (this.currentLyric.lines[i].time / 1000 >= time) {
+						this.lineNo = i
+						break
+					}
+				}
 			},
+			//移动进度条
+			moveSlider(val) {
+				this.$refs.player.currentTime = val //将子组件传来的时间赋给播放器时间
+				this.currentNo(val) //获取应该跳转的行数
+				document.querySelector('.lineHigh').removeAttribute('class') //先去掉其他样式
+				this.lineHigh(this.lineNo)
+			},
+			//下一首
 			nextTrack() {
-				this.$store.dispatch('addIndex')
-				// this.currentIndex += 1
+				this.addIndex()
 				this.$refs.ctl.pause()
 				this.musicInit()
 				setTimeout(() => {
 					this.$refs.ctl.play()
 				}, 1000)
 			},
+			//上一首
 			preTrack() {
-				const that = this
-				that.subIndex('subIndex')
-				// this.currentIndex -= 1
+				this.subIndex()
 				this.$refs.ctl.pause()
 				this.musicInit()
 				setTimeout(() => {
@@ -276,7 +314,7 @@
 	}
 	li {
 		font-size: 16px;
-		transition-duration: 1000ms;
+		transition-duration: 500ms;
 	}
 	.iconbox {
 		display: flex;
