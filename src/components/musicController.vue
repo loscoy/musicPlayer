@@ -73,6 +73,9 @@
 		computed: {
 			currentIndex() {
 				return this.$store.state.song.currentIndex
+			},
+			idList() {
+				return this.songIdList
 			}
 		},
 		mounted() {
@@ -135,14 +138,10 @@
 				}
 			},
 			playItem(index) {
-				setTimeout(() => {
-					let playList = this.$refs.playList
-					playList[this.currentIndex].scrollIntoView({ behavior: 'smooth' })
-				}, 500)
 				this.pause()
 				this.$store.dispatch('setSong', {
 					currentIndex: index,
-					songIdList: JSON.parse(sessionStorage.getItem('songIdList'))
+					songIdList: this.idList
 				})
 				this.$emit('musicInit')
 				setTimeout(() => {

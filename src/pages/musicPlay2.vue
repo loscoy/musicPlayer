@@ -40,14 +40,14 @@
 			<music-controller ref="ctl" @moveSlider="moveSlider" @play="play" @pause="pause" @nextTrack="nextTrack"
 				@preTrack="preTrack" @musicInit="musicInit" :currentTime="currentTime" :durationTime="durationTime"
 				:songIdList="songIdList"></music-controller>
-			<audio class="audio" v-show="false" @canplay="canplay" @timeupdate="updateTime" ref="player" :src="musicUrl" controls></audio>
+			<audio class="audio" v-show="false" @canplay="canplay" @timeupdate="updateTime" ref="player" :src="musicUrl"
+				controls></audio>
 		</div>
 	</div>
 </template>
 
 <script>
 	import Vue from 'vue'
-	import axios from '@/plugins/axios'
 	import iconfont from '@/assets/font/iconfont.css'
 	import Lyric from 'lyric-parser'
 	import { getDetailInfo, getLyric, getMusicUrl, getSQUrl } from '../Api/music'
@@ -102,7 +102,6 @@
 		methods: {
 			...mapActions(['addIndex', 'subIndex', 'hideMusicplay']),
 			musicInit() {
-				this.lineNo = 0
 				this.getLyric(this.musicId)
 				getSQUrl(this.musicId).then(res => {
 					if (res.data.data.code === 200) {
@@ -116,6 +115,7 @@
 							this.getPlayer()
 						})
 					}
+					this.lineNo = 0
 				})
 			},
 			getPlayer() {
@@ -153,7 +153,9 @@
 				}
 			},
 
-			lyricHandle({ lineNum, txt }) {},
+			lyricHandle({ lineNum, txt }) {
+				console.log(lineNum, txt)
+			},
 			handleArtist(musicInfo) {
 				let l = musicInfo.ar.length
 				let s = ''
@@ -201,7 +203,7 @@
 			// 歌词重置
 			goback() {
 				const ulist = this.$refs.ul
-				document.querySelector('.lineHigh').removeAttribute('class')
+				ulist.querySelector('.lineHigh').removeAttribute('class')
 				this.lineNo = 0 //lineNo清零，重新播放
 			},
 			updateTime(e) {
@@ -229,7 +231,7 @@
 				length = this.currentLyric.lines.length
 				for (let i = 0; i < length; i++) {
 					if (this.currentLyric.lines[i].time / 1000 >= time) {
-						this.lineNo = i
+						this.lineNo = i - 1
 						break
 					}
 				}
@@ -238,7 +240,8 @@
 			moveSlider(val) {
 				this.$refs.player.currentTime = val //将子组件传来的时间赋给播放器时间
 				this.currentNo(val) //获取应该跳转的行数
-				document.querySelector('.lineHigh').removeAttribute('class') //先去掉其他样式
+				const ulist = this.$refs.ul
+				ulist.querySelector('.lineHigh').removeAttribute('class') //移除之前的高亮
 				this.lineHigh(this.lineNo)
 			},
 			//下一首
