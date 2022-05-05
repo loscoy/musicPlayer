@@ -5,7 +5,10 @@
 		</div>
 		<div class="controller">
 			<div class="buttons">
-				<div class="mode"><i class="icon icon-repeat"></i> </div>
+				<div class="model">
+					<i class="icon icon-repeat" v-if="playModel===0" @click="changeModel"></i>
+					<i class="icon icon-shuffle" v-if="playModel===1" @click="changeModel"></i>
+				</div>
 				<div class="button">
 					<div class="left"><i class="icon icon-skip-back" @click="preTrack"></i> </div>
 					<div class="center">
@@ -52,7 +55,8 @@
 				show: true,
 				schedule: 0,
 				open: false,
-				songList: []
+				songList: [],
+				shuffleSongIdList: []
 			}
 		},
 		props: {
@@ -76,10 +80,16 @@
 			},
 			idList() {
 				return this.songIdList
+			},
+			playModel() {
+				return this.$store.state.playModel
 			}
 		},
 		mounted() {
-			this.getSongList()
+			if (this.songIdList) {
+				console.log(this.songIdList);
+				this.getSongList()
+			}
 		},
 		methods: {
 			play() {
@@ -114,9 +124,9 @@
 				let art = ''
 				let artArr = []
 				this.songList = []
-				getDetailInfo(...this.songIdList).then(res => {
+				getDetailInfo(...this.songIdList).then((res) => {
 					songsArr = res.data.songs
-					songsArr.forEach(item => {
+					songsArr.forEach((item) => {
 						artArr = item.ar
 						artArr.forEach((elem, index) => {
 							if (index < artArr.length - 1) {
@@ -147,6 +157,9 @@
 				setTimeout(() => {
 					this.play()
 				}, 1000)
+			},
+			changeModel() {
+				this.$store.dispatch('changePlayModel')
 			}
 		}
 	}

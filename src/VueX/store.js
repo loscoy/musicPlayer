@@ -11,22 +11,30 @@ export default new Vuex.Store({
     },
     song: {
       currentIndex: Number(sessionStorage.getItem("currentIndex")) || 0,
-      songIdList: JSON.parse(sessionStorage.getItem("songIdList")) || ''
+      songIdList: JSON.parse(sessionStorage.getItem("songIdList")) || '',
     },
-    musicPlayShow: Number(sessionStorage.getItem('musicPlayShow')) || 0
+    musicPlayShow: Number(sessionStorage.getItem('musicPlayShow')) || 0,
+    playModel: Number(sessionStorage.getItem('playModel')) || 0
   },
   mutations: {
     SET_SONG: (state, data) => {
       state.song.currentIndex = Number(data.currentIndex)
       state.song.songIdList = data.songIdList
+
       sessionStorage.removeItem('currentIndex')
       sessionStorage.removeItem('songIdList')
       sessionStorage.setItem('currentIndex', JSON.stringify(data.currentIndex))
-      sessionStorage.setItem('songIdList', JSON.stringify(data.songIdList))
+      sessionStorage.setItem('songIdList', JSON.stringify(state.song.songIdList))
     },
     ADD_INDEX: (state) => {
       if (state.song.currentIndex < state.song.songIdList.length - 1) {
-        state.song.currentIndex += 1
+        if (state.playModel === 0) {
+          state.song.currentIndex += 1
+        } else {
+          let length = state.song.songIdList.length
+          let random = parseInt(Math.random() * length)
+          state.song.currentIndex = random
+        }
       } else {
         state.song.currentIndex = 0
       }
@@ -36,7 +44,13 @@ export default new Vuex.Store({
       if (state.song.currentIndex === 0) {
         state.song.currentIndex = state.song.songIdList.length - 1
       } else {
-        state.song.currentIndex -= 1
+        if (state.playModel === 0) {
+          state.song.currentIndex -= 1
+        } else {
+          let length = state.song.songIdList.length
+          let random = parseInt(Math.random() * length)
+          state.song.currentIndex = random
+        }
       }
       sessionStorage.setItem("currentIndex", JSON.stringify(state.song.currentIndex))
     },
@@ -61,9 +75,21 @@ export default new Vuex.Store({
       state.musicPlayShow = 1
       sessionStorage.removeItem('musicPlayShow')
       sessionStorage.setItem('musicPlayShow', JSON.stringify(state.musicPlayShow))
+    },
+    CHANGE_PLAYMODEL: (state) => {
+      if (state.playModel === 0) {
+        state.playModel = 1
+      } else {
+        state.playModel = 0
+      }
+      sessionStorage.setItem('playModel', JSON.stringify(state.playModel))
     }
   },
-  
+
+  getters: {
+
+  },
+
   actions: {
     setUser({
       commit
@@ -99,6 +125,11 @@ export default new Vuex.Store({
       commit
     }) {
       commit('HIND_MUSICPLAY')
+    },
+    changePlayModel({
+      commit
+    }) {
+      commit('CHANGE_PLAYMODEL')
     }
   }
 })

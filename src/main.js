@@ -13,11 +13,7 @@ import 'muse-ui/dist/muse-ui.css';
 import Toast from "muse-ui-toast";
 import AtComponents from 'at-ui'
 import 'at-ui-style'
-//导入 bootstrap icons图标插件组件
-import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
-//导入 stylesheet 样式
-import 'bootstrap/dist/css/bootstrap.css'
-import 'bootstrap-vue/dist/bootstrap-vue.css'
+
 
 const ToastOption = {
   position: 'bottom',               // 弹出的位置
@@ -30,9 +26,6 @@ const ToastOption = {
   errorIcon: ''              // 错误信息图标
 }
 
-Vue.use(BootstrapVue)
-//可选地安装BootstrapVue图标插件组件
-Vue.use(IconsPlugin)
 Vue.use(ElementUI)
 Vue.use(MuseUI);
 Vue.use(Toast,ToastOption)

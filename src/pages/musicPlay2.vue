@@ -31,9 +31,9 @@
 			</div>
 
 			<div class="iconbox">
-				<i class="iconfont icon-shoucang2 left"></i>
+				<i class="icon icon-heart"></i>
 				<i class="box"></i>
-				<i class="iconfont icon-xiazai right"></i>
+				<i class="icon icon-more-vertical"></i>
 			</div>
 		</div>
 		<div class="song">
@@ -54,7 +54,7 @@
 	import musicController from '../components/musicController'
 	import { mapActions, mapState } from 'vuex'
 
-	const LRC2 = Vue.component('lrc', resolve => require(['../components/LRC2'], resolve))
+	const LRC2 = Vue.component('lrc', (resolve) => require(['../components/LRC2'], resolve))
 
 	export default {
 		name: 'musicPlay',
@@ -80,9 +80,9 @@
 		},
 		computed: {
 			...mapState({
-				currentIndex: state => state.song.currentIndex,
-				songIdList: state => state.song.songIdList,
-				musicPlayShow: state => state.musicPlayShow
+				currentIndex: (state) => state.song.currentIndex,
+				songIdList: (state) => state.song.songIdList,
+				musicPlayShow: (state) => state.musicPlayShow
 			}),
 			musicId() {
 				return this.songIdList[this.currentIndex]
@@ -97,29 +97,31 @@
 			}
 		},
 		created() {
-			this.musicInit()
+			if (this.musicId) {
+				this.musicInit()
+			}
 		},
 		methods: {
 			...mapActions(['addIndex', 'subIndex', 'hideMusicplay']),
 			musicInit() {
 				this.getLyric(this.musicId)
-				getSQUrl(this.musicId).then(res => {
+				getSQUrl(this.musicId).then((res) => {
 					if (res.data.data.code === 200) {
 						//如果存在则使用高品质播放链接
 						this.musicUrl = res.data.data.url
 						this.getPlayer()
 					} else {
 						//否则使用试听链接
-						getMusicUrl(this.musicId).then(res => {
+						getMusicUrl(this.musicId).then((res) => {
 							this.musicUrl = res.data.data[0].url
 							this.getPlayer()
 						})
 					}
-					this.lineNo = 0
+					this.goback()
 				})
 			},
 			getPlayer() {
-				getDetailInfo(this.musicId).then(res => {
+				getDetailInfo(this.musicId).then((res) => {
 					this.musicInfo = {
 						name: res.data.songs[0].name,
 						picUrl: res.data.songs[0].al.picUrl
@@ -153,9 +155,7 @@
 				}
 			},
 
-			lyricHandle({ lineNum, txt }) {
-				console.log(lineNum, txt)
-			},
+			lyricHandle({ lineNum, txt }) {},
 			handleArtist(musicInfo) {
 				let l = musicInfo.ar.length
 				let s = ''
@@ -180,7 +180,7 @@
 				const list = ulist.getElementsByTagName('li')
 
 				// 删除之前的高亮样式并设置当前点击部分高亮样式
-				list[this.lineNo - 1].removeAttribute('class') //去掉上一行的高亮样式
+				list[this.lineNo - 1].removeAttribute('class')
 				this.lineNo = index //当前歌词行数为所点歌词行数
 				list[this.lineNo].className = 'lineHigh' //高亮显示当前行
 
@@ -192,6 +192,7 @@
 			lineHigh(lineNo) {
 				const ulist = this.$refs.ul
 				const list = ulist.getElementsByTagName('li')
+				const pre = document.getElementsByClassName('lineHigh')
 				if (lineNo > 0) {
 					list[lineNo - 1].removeAttribute('class') //去掉上一行的高亮样式
 				}
@@ -203,7 +204,10 @@
 			// 歌词重置
 			goback() {
 				const ulist = this.$refs.ul
-				ulist.querySelector('.lineHigh').removeAttribute('class')
+				const items = ulist.querySelectorAll('.lineHigh')
+				items.forEach((element) => {
+					element.removeAttribute('class')
+				})
 				this.lineNo = 0 //lineNo清零，重新播放
 			},
 			updateTime(e) {
@@ -321,10 +325,11 @@
 	}
 	.iconbox {
 		display: flex;
-		margin-top: 30px;
+		margin: 15px 0 15px;
 		position: absolute;
 		bottom: 70px;
 		width: 90%;
+		font-size: 20px;
 	}
 	.iconbox .box {
 		flex: 1;

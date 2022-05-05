@@ -46,7 +46,7 @@
 			<mu-load-more @refresh="refresh" :refreshing="refreshing">
 				<h3>{{this.$route.query.title}}</h3>
 				<div class="info url log" v-for="(item,index) in morelist" :key="index">
-					<div @click="play(index)" role="link">
+					<div @click="play(index)">
 						<div class="poster">
 							<div class="img">
 								<img :src="item.picUrl" :alt="item.name">
@@ -65,9 +65,9 @@
 
 <script>
 	import axios from '../plugins/axios'
-	import vuepullrefresh from 'vue-pull-refresh'
 	import router from '../router'
 	import { TodayRecommendSongs } from '../Api/music'
+	import { mapActions } from 'vuex'
 
 	export default {
 		name: 'moreList', //更多列表组件（热门歌单，今日推荐）
@@ -78,41 +78,40 @@
 				refreshing: false
 			}
 		},
-		components: {
-			'vue-pull-refresh': vuepullrefresh
-		},
+		components: {},
 		mounted() {
 			if (this.$route.query.url === '/personalized/newsong') {
 				axios
 					.get(this.$route.query.url)
-					.then(res => {
+					.then((res) => {
 						// console.log("1",res.data.result[0].song.artists[0].name)
 						this.morelist = res.data.result
 					})
-					.catch(error => {
+					.catch((error) => {
 						console.log(error)
 					})
 			}
 			if (this.$route.query.url === '/recommend/songs') {
-				TodayRecommendSongs().then(res => {
+				TodayRecommendSongs().then((res) => {
 					this.morelist = res.data.data.dailySongs
 				})
 			}
 			if (this.$route.query.url === '/album/newest') {
 				axios
 					.get(this.$route.query.url)
-					.then(res => {
+					.then((res) => {
 						this.morelist = res.data.albums
 						this.morelist = this.morelist.slice(0, 10)
 						// console.log("list",this.morelist)
 					})
-					.catch(error => {
+					.catch((error) => {
 						console.log(error)
 					})
 			}
 			// console.log("api",this.$route.query.url)
 		},
 		methods: {
+			...mapActions(['showMusicplay', 'setSong']),
 			refresh() {
 				this.refreshing = true
 				this.$refs.container.scrollTop = 0
@@ -120,16 +119,16 @@
 					if (this.$route.query.url === '/personalized/newsong') {
 						axios
 							.get(this.$route.query.url)
-							.then(res => {
+							.then((res) => {
 								console.log('1', res.data)
 								this.morelist = res.data.result
 							})
-							.catch(error => {
+							.catch((error) => {
 								console.log(error)
 							})
 					}
-					if (this.$route.query.url === '/artists?id=6452') {
-						TodayRecommendSongs().then(res => {
+					if (this.$route.query.url === '/recommend/songs') {
+						TodayRecommendSongs().then((res) => {
 							this.morelist = res.data.data.dailySongs
 							this.morelist = this.morelist.slice(this.offset, this.offset + 10)
 							// console.log("2",this.offset,this.offset+10)
@@ -147,21 +146,20 @@
 					if (this.$route.query.url === '/album/newest') {
 						axios
 							.get(this.$route.query.url)
-							.then(res => {
+							.then((res) => {
 								this.morelist = res.data.albums
 							})
-							.catch(error => {
+							.catch((error) => {
 								console.log(error)
 							})
 					}
 
 					this.refreshing = false
-				}, 1000)
+				})
 			},
-			...mapActions(['showMusicplay','setSong']),
 			play(index) {
 				let arr = []
-				this.morelist.forEach(item => {
+				this.morelist.forEach((item) => {
 					arr.push(item.id)
 				})
 				this.setSong({ currentIndex: index, songIdList: arr })

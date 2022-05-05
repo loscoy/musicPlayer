@@ -4,21 +4,16 @@ import qs from 'qs'
 
 const Api = axios.create({
   baseURL: 'http://localhost:3000/',
+  timeout: 5000,
   withCredentials: true, // 允许跨域设置，不然可能因为拿不到cookie而报错
 })
 /*请求拦截*/
 Api.interceptors.request.use(
   config => {
     if (config.method === 'post' && !(config.data instanceof FormData)) {
-      if (localStorage.getItem('token')) {
-        config.headers = {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          "Authorization": localStorage.getItem('token')
-        }
-      } else {
-        config.headers = {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        }
+      config.headers = {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        "Authorization": localStorage.getItem('token')
       }
       config.data = qs.stringify(config.data, {
         arrayFormat: 'repeat'
