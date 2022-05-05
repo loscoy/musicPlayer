@@ -13,7 +13,7 @@
 
 > 由于网易云音乐接口的歌词时间单位中，秒有三位数，而lyric-parser只解析到两位，所以需要对lyric-parser的源码进行修改
 > 路径node_moudules->lyric-parser->dist->lyric.js
-![image.png](https://s2.loli.net/2022/05/04/bZlirHYVR2Q4Wyt.png)
+![image.png](https://s2.loli.net/2022/05/05/9YwDEJlGu1XVePM.png)
 ## Build Setup
 
 ``` bash
