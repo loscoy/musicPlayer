@@ -83,11 +83,12 @@
 			},
 			playModel() {
 				return this.$store.state.playModel
-			}
+			},
+			
 		},
 		mounted() {
 			if (this.songIdList) {
-				console.log(this.songIdList);
+				// console.log(this.songIdList);
 				this.getSongList()
 			}
 		},
