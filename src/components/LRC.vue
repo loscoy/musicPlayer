@@ -121,7 +121,7 @@ export default {
 }
 
 .active {
-  color: pink;
+  color: rgb(225, 100, 121);
   font-size: 15px;
 }
 </style>

@@ -311,11 +311,14 @@ export default {
 }
 
 .song-info-img {
+	width: 50%;
+	margin: auto;
 	text-align: center;
 }
 
 .song-info-img img {
-	width: 50%;
+	height: 46vw;
+	width: 100vh;
 	border-radius: 15%;
 }
 
