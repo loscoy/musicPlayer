@@ -1,30 +1,26 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import createPersistedState from "vuex-persistedstate"
 
 Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
     user: {
-      token: localStorage.getItem("token") || "",
-      id: localStorage.getItem("userId") || "",
+      token: "",
+      id: "",
     },
     song: {
-      currentIndex: Number(localStorage.getItem("currentIndex")) || 0,
-      songIdList: JSON.parse(localStorage.getItem("songIdList")) || '',
+      currentIndex: 0,
+      songIdList: "",
     },
-    musicPlayShow: Number(localStorage.getItem('musicPlayShow')) || 0,
-    playModel: Number(localStorage.getItem('playModel')) || 0
+    musicPlayShow:  0,
+    playModel: 0
   },
   mutations: {
     SET_SONG: (state, data) => {
       state.song.currentIndex = Number(data.currentIndex)
       state.song.songIdList = data.songIdList
-
-      localStorage.removeItem('currentIndex')
-      localStorage.removeItem('songIdList')
-      localStorage.setItem('currentIndex', JSON.stringify(data.currentIndex))
-      localStorage.setItem('songIdList', JSON.stringify(state.song.songIdList))
     },
     ADD_INDEX: (state) => {
       if (state.song.currentIndex < state.song.songIdList.length - 1) {
@@ -38,7 +34,6 @@ export default new Vuex.Store({
       } else {
         state.song.currentIndex = 0
       }
-      localStorage.setItem("currentIndex", JSON.stringify(state.song.currentIndex))
     },
     SUB_INDEX: (state) => {
       if (state.song.currentIndex === 0) {
@@ -52,29 +47,20 @@ export default new Vuex.Store({
           state.song.currentIndex = random
         }
       }
-      localStorage.setItem("currentIndex", JSON.stringify(state.song.currentIndex))
     },
     SET_USER: (state, data) => {
       state.user.token = data.token
       state.user.id = data.id
-      localStorage.clear();
-      localStorage.setItem("userId", JSON.stringify(data.id));
-      localStorage['token'] = JSON.stringify(data.token)
     },
     CLEAR_USER: (state) => {
       state.user.token = ''
       state.user.id = ''
-      localStorage.clear()
     },
     HIND_MUSICPLAY: (state) => {
       state.musicPlayShow = 0
-      localStorage.removeItem('musicPlayShow')
-      localStorage.setItem('musicPlayShow', JSON.stringify(state.musicPlayShow))
     },
     SHOW_MUSICPLAY: (state) => {
       state.musicPlayShow = 1
-      localStorage.removeItem('musicPlayShow')
-      localStorage.setItem('musicPlayShow', JSON.stringify(state.musicPlayShow))
     },
     CHANGE_PLAYMODEL: (state) => {
       if (state.playModel === 0) {
@@ -82,12 +68,11 @@ export default new Vuex.Store({
       } else {
         state.playModel = 0
       }
-      localStorage.setItem('playModel', JSON.stringify(state.playModel))
     }
   },
 
   getters: {
-
+   
   },
 
   actions: {
@@ -131,5 +116,6 @@ export default new Vuex.Store({
     }) {
       commit('CHANGE_PLAYMODEL')
     }
-  }
+  },
+  plugins:[createPersistedState()]
 })

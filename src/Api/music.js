@@ -66,3 +66,17 @@ export function getSQUrl(id){
     methods:'get'
   })
 }
+
+//获取歌曲评论
+export function getcomment(data){
+  return Api({
+    url:"/comment/new",
+    params:{
+      id:data.id,//资源 id
+      type:data.type, //资源类型 
+      pageNo:data.pageNo,//分页参数,,第 N 页,默认为 1
+      pageSize:data.pageSize,//分页参数,每页多少条数据,默认 20
+      sortType:data.sortType,//排序方式, 1:按推荐排序, 2:按热度排序, 3:按时间排序
+    }
+  })
+}

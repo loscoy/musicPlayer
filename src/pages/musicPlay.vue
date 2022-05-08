@@ -50,7 +50,6 @@
   import Aplayer from 'vue-aplayer'
   import Vue from "vue"
   import axios from "@/plugins/axios"
-  import iconfont from "@/assets/font/iconfont.css"
   // import LRC from "../components/LRC";
 
   const LRC = Vue.component("lrc",(resolve)=>require(["../components/LRC"],resolve))

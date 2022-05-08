@@ -132,6 +132,7 @@
 		background-color: #fff;
 		padding: 10px 17px;
 		margin-top: 10px;
+		z-index: -1;
 	}
 	.hd {
 		display: flex;

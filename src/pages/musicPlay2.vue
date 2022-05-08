@@ -10,16 +10,17 @@
 					<p>{{ musicInfo.name }}</p>
 					<p class="author">{{ artistName }}</p>
 				</div>
-				<router-link to="/search">
-					<i class="iconfont icon-sousuo right"></i>
-				</router-link>
+				<div>
+					<i class="icon icon-share-2 right"></i>
+				</div>
 			</div>
 		</div>
 
 		<div class="song-info">
 			<div class="song-info-img">
 				<img :src="musicInfo.picUrl" alt="musicName">
-				<div class="song-lrc">
+			</div>
+			<div class="song-lrc">
 					<!--          <LRC2 :currentLyric="currentLyric" :currentLyricNum="currentLyricNum" :lrcId="parseInt(musicId)"></LRC2>-->
 					<ul ref="ul" class="content">
 						<li :id="index" v-for="(item, index) in currentLyric.lines" @click="playThis(index)" :key="index">
@@ -27,16 +28,24 @@
 					</ul>
 					<div class="no-lyric" v-if="lrcLength === 0">暂无歌词,请搜索重试</div>
 				</div>
-
-			</div>
-
-			<div class="iconbox">
+			<mu-dialog width="360" transition="slide-bottom" fullscreen :open.sync="openComment">
+				<mu-appbar color="red" title="评论">
+					<mu-button slot="left" icon @click="closeCommit">
+						<i class="icon icon-x"></i>
+					</mu-button>
+				</mu-appbar>
+				<div style="padding: 10px;">
+					<comment-vue></comment-vue>
+				</div>
+			</mu-dialog>
+		</div>
+		<div class="iconbox">
 				<i class="icon icon-heart"></i>
-				<i class="box"></i>
+				<i class="icon icon-download" @click="downloadMusic"></i>
+				<i class="icon icon-message-circle" @click="seeComment"></i>
 				<i class="icon icon-more-vertical"></i>
 			</div>
-		</div>
-		<div class="song">
+		<div class="ctrl">
 			<music-controller ref="ctl" @moveSlider="moveSlider" @play="play" @pause="pause" @nextTrack="nextTrack"
 				@preTrack="preTrack" @musicInit="musicInit" :currentTime="currentTime" :durationTime="durationTime"
 				:songIdList="songIdList"></music-controller>
@@ -50,7 +59,8 @@
 import Vue from 'vue'
 import Lyric from 'lyric-parser'
 import { getDetailInfo, getLyric, getMusicUrl, getSQUrl } from '../Api/music'
-import musicController from '../components/musicController'
+import musicController from '../components/MusicPlay/musicController'
+import commentVue from '../components/MusicPlay/comment.vue'
 import { mapActions, mapState } from 'vuex'
 
 const LRC2 = Vue.component('lrc', (resolve) => require(['../components/LRC2'], resolve))
@@ -71,12 +81,14 @@ export default {
 			lrcLength: 0,
 			currentTime: 0,
 			durationTime: 0,
-			can: false
+			can: false,
+			openComment: false
 		}
 	},
 	components: {
 		LRC2,
-		musicController
+		musicController,
+		commentVue
 	},
 	computed: {
 		...mapState({
@@ -259,7 +271,9 @@ export default {
 			this.addIndex()
 			this.$refs.ctl.pause()
 			if (this.can) {
-				this.$refs.ctl.play()
+				setTimeout(() => {
+					this.$refs.ctl.play()
+				}, 1000)
 			}
 		},
 		//上一首
@@ -267,8 +281,44 @@ export default {
 			this.subIndex()
 			this.$refs.ctl.pause()
 			if (this.can) {
-				this.$refs.ctl.play()
+				setTimeout(() => {
+					this.$refs.ctl.play()
+				}, 1000)
 			}
+		},
+		//音乐下载
+		downloadMusic () {
+			// location.href = this.$refs.player.src //简单粗暴
+
+			let downUrl = this.$refs.player.src // 音乐地址 
+			let fileName = this.musicInfo.name + ' - ' + this.artistName // 文件名设置
+			this.$axios({
+				method: 'get',
+				url: downUrl,
+				responseType: 'blob',
+				headers: { 'content-type': 'audio/mpeg' }
+				// headers: {'content-length': '4066786', 'content-type': 'audio/mpeg'}
+			}).then((res) => {
+				let blobType = 'application/force-download' // 设置blob请求头
+				let blob = new Blob([res.data], { type: res.data.type }) // 创建blob 设置blob文件类型 data 设置为后端返回的文件(例如mp3,jpeg) type:这里设置后端返回的类型 为 mp3
+				console.log(res);
+				let downa = document.createElement('a') // 创建A标签
+				let href = window.URL.createObjectURL(blob) // 创建下载的链接
+				downa.href = href // 下载地址
+				downa.download = fileName // 下载文件名
+				document.body.appendChild(downa)
+				downa.click() // 模拟点击A标签
+				document.body.removeChild(downa) // 下载完成移除元素
+				window.URL.revokeObjectURL(href) // 释放blob对象
+			}).catch(function (error) {
+				console.log(error)
+			})
+		},
+		seeComment () {
+			this.openComment = true
+		},
+		closeCommit () {
+			this.openComment = false
 		}
 	}
 }
@@ -291,7 +341,7 @@ export default {
 
 .title {
 	display: flex;
-	text-align: center;
+	align-items: center;
 }
 
 .left {
@@ -303,7 +353,7 @@ export default {
 }
 
 .right {
-	font-size: 30px;
+	font-size: 25px;
 }
 
 .song-info {
@@ -326,7 +376,6 @@ export default {
 	margin-top: 30px;
 	min-height: 50px;
 	overflow: scroll;
-	position: absolute;
 	right: 0;
 	left: 0;
 	height: 230px;
@@ -345,27 +394,19 @@ li {
 
 .iconbox {
 	display: flex;
-	margin: 15px 0 15px;
-	position: absolute;
-	bottom: 70px;
+	padding: 0 10px 0 10px;
+	margin-bottom: 20px;
+	justify-content: space-between;
 	width: 90%;
+	margin: auto;
+	margin-top: 10px;
 	font-size: 20px;
 }
 
-.iconbox .box {
-	flex: 1;
-	height: 70%;
-}
-
-.song {
+.ctrl {
 	text-align: center;
 	width: 100%;
-	position: absolute;
-	bottom: 0;
-}
-
-.song audio {
-	width: 100%;
+	margin-top: 20px;
 }
 
 .author {

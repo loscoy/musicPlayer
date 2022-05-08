@@ -46,7 +46,7 @@
 </template>
 
 <script>
-	import { getDetailInfo } from '../Api/music'
+	import { getDetailInfo } from '../../Api/music'
 
 	export default {
 		name: 'musicController',

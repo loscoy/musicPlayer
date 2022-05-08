@@ -7,14 +7,11 @@
             <i class="icon icon-menu" style="font-size: 25px"></i>
           </mu-button>
         </li>
-        <li>
-          <i class="icon icon-music"></i>
-        </li>
         <li class="header-lrc">
+          <i class="icon icon-music" style="margin-right:10px"></i>
           <LRC></LRC>
         </li>
       </ul>
-
     </div>
     <drawer :userInfo="userInfo" :open="open" @open1="open1"></drawer>
   </div>
@@ -63,16 +60,18 @@ export default {
 <style scoped>
 .header-top ul {
   display: flex;
-  align-items: left;
+  justify-content: left;
   height: 50px;
   line-height: 40px;
   list-style: none;
   width: 100%;
+  align-items: center;
 }
 
 .header-top ul li {
-  /*text-align: center;*/
+  display: flex;
   padding: 3px;
+  align-items: center;
 }
 
 .header-top {
@@ -91,19 +90,24 @@ export default {
 }
 
 .header-lrc {
-  width: 80%;
+  width: 90%;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 </style>
 <style>
-.headerC .el-card__body {
+.header .el-card__body {
   padding: 0;
 }
 
-.mu-button-wrapper {
+.header .mu-button-wrapper {
   justify-content: left;
 }
 
-.mu-button {
-  width: 30px;
+.header .mu-flat-button {
+  min-width: 30px;
 }
 </style>
