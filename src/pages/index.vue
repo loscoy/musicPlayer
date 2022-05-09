@@ -4,12 +4,12 @@
 			<el-header class="index-header">
 				<Header></Header>
 			</el-header>
-			<el-main>
+			<div class="main">
 				<router-view />
-			</el-main>
-			<el-footer class="index-footer">
+			</div>
+			<div ref="footer" class="index-footer">
 				<Footer></Footer>
-			</el-footer>
+			</div>
 		</el-container>
 		<mu-scale-transition>
 			<musicplay class="musicPlay" v-show="musicPlayShow"></musicplay>
@@ -33,6 +33,22 @@ export default {
 		Footer,
 		Header,
 		musicplay
+	},
+	mounted () {
+		document.addEventListener('scroll', this.onScroll)
+	},
+	methods: {
+		onScroll () {
+			const scrollTop = document.documentElement.scrollTop + document.body.scrollTop
+			const footerDom = this.$refs.footer
+			if (scrollTop >= 100) {
+				if (!footerDom.getAttribute("class").includes("no-top")) {
+					footerDom.className = 'index-footer not-top'
+				}
+			} else {
+				footerDom.className = 'index-footer'
+			}
+		}
 	}
 }
 </script>
@@ -68,6 +84,7 @@ export default {
 	padding: 0;
 	position: fixed;
 	overflow: hidden;
+	width: 100%;
 	left: 0;
 	right: 0;
 	top: 0;
@@ -75,21 +92,32 @@ export default {
 }
 
 .index-footer {
-	height: 40px !important;
-	overflow: hidden;
+	position: fixed;
+	height: 50px;
+	z-index: 11;
+	width: 100%;
+	bottom: 0;
+	transition: all 0.7s;
+	transform: translate3d(0, 0, 0);
+
 }
-.musicPlay{
+
+.not-top {
+	transform: translate3d(0, 100px, 0);
+}
+
+.musicPlay {
 	position: absolute;
 	z-index: 20;
 	top: 0;
 	background-color: white;
 }
-</style>
-<style>
-.index .el-main {
+.index .main {
 	padding: 10px;
 	margin-top: 45px;
 }
+</style>
+<style>
 
 .footer .el-card__body {
 	padding: 0;

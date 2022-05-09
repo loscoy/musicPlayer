@@ -2,7 +2,7 @@
   <div class="comment">
     <div class="container">
       <ul>
-        <li ref="li" v-for="(item, index) in commentInfo.comments" :key="'new' + index">
+        <li class="comList border-1px" ref="li" v-for="(item, index) in commentInfo.comments" :key="'new' + index">
           <div class="userInfo">
             <div class="avatar">
               <img :src="item.user.avatarUrl" alt="tx">
@@ -17,11 +17,11 @@
             </div>
           </div>
           <div class="content">{{ item.content }}</div>
-          <mu-divider></mu-divider>
         </li>
       </ul>
     </div>
-    <mu-pagination :total="parseInt(commentInfo.totalCount)" :page-size="100" @change="changePageNo" :current.sync="pageNo">
+    <mu-pagination :total="parseInt(commentInfo.totalCount)" :page-size="100" @change="changePageNo"
+      :current.sync="pageNo">
     </mu-pagination>
   </div>
 </template>
@@ -86,6 +86,24 @@ export default {
   margin-bottom: 10px;
 }
 
+.comList{
+  position: relative;
+}
+.comList:after {
+  content: '';
+  display: block;
+  position: absolute;
+  left: 15vw;
+  bottom: 0;
+  height: 1px;
+  width: 100%;
+  background-color: #969192;
+}
+.border-1px:after{
+  width: 100%;
+  -webkit-transform: scaleY(0.7);
+  transform: scaleY(0.7);
+}
 .userInfo {
   display: flex;
   align-items: center;
@@ -116,16 +134,15 @@ export default {
   overflow: hidden;
 }
 
-.mu-divider {
-  margin-left: 15vw;
-}
 
 .content {
   margin-left: 15vw;
   margin-bottom: 10px;
   font-size: 13px;
+  position: relative;
 }
-.comment .mu-pagination{
+
+.comment .mu-pagination {
   width: 100%;
   margin: auto;
   font-size: 12px;

@@ -7,7 +7,7 @@
             <i class="icon icon-menu" style="font-size: 25px"></i>
           </mu-button>
         </li>
-        <li class="header-lrc">
+        <li class="header-lrc" @click="toMusicplay">
           <i class="icon icon-music" style="margin-right:10px"></i>
           <LRC></LRC>
         </li>
@@ -52,6 +52,9 @@ export default {
   methods: {
     open1 (val) {
       this.open = val
+    },
+    toMusicplay(){
+      this.$store.dispatch("showMusicplay")
     }
   }
 };

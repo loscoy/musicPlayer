@@ -52,7 +52,6 @@
 		left: 0;
 		right: 0;
 		bottom: 0;
-		z-index: 9;
 	}
 	.footer ul {
 		display: flex;
@@ -72,4 +71,5 @@
 		background-color: rgba(255, 255, 255, 0.72);
 		backdrop-filter: saturate(180%) blur(20px);
 	}
+	
 </style>
