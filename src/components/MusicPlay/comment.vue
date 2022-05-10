@@ -20,7 +20,7 @@
         </li>
       </ul>
     </div>
-    <mu-pagination :total="parseInt(commentInfo.totalCount)" :page-size="100" @change="changePageNo"
+    <mu-pagination :total="totalCount" :page-size="100" @change="changePageNo"
       :current.sync="pageNo">
     </mu-pagination>
   </div>
@@ -37,7 +37,8 @@ export default {
       pageNo: 1,
       type: 0,
       sortType: 2,
-      commentInfo: []
+      commentInfo: [],
+      totalCount:100
     }
   },
   computed: {
@@ -68,6 +69,9 @@ export default {
       }
       getcomment(params).then(res => {
         this.commentInfo = res.data.data
+        if(this.commentInfo.comments!==[]){
+          this.totalCount += 100
+        }
       })
     },
     changePageNo (val) {
