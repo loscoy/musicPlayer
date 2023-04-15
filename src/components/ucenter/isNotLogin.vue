@@ -22,12 +22,17 @@
               立即登录<i class="el-icon-arrow-right"></i>
             </div>
 
-            <mu-dialog :title="title" width="600" max-width="90%" style="border-radius:10px"
+            <el-dialog :visible.sync="openAlert" width="90%" class="loginDialog">
+              <div class="dialogTitle">{{title}}</div>
+              <div @click="changeComp('loginQRVue', '二维码登陆', '')">二维码登陆</div>
+              <component @change="changeComp" @closeAlert="closeAlertDialog" :is="comp"></component>
+            </el-dialog>
+            <!-- <mu-dialog :title="title" width="600" max-width="90%" style="border-radius:10px"
                        :esc-press-close="false" :overlay-close="false" :open.sync="openAlert"
             >
               <component @change="changeComp" @closeAlert="closeAlertDialog" :is="comp"></component>
               <mu-button slot="actions" flat color="primary"  @click="closeAlertDialog">{{actions}}</mu-button>
-            </mu-dialog>
+            </mu-dialog> -->
 
           </div>
         </div>
@@ -76,6 +81,7 @@
 <script>
   import {mapState} from 'vuex'
   import login from "../login && regist/login";
+  import loginQRVue from '../login && regist/loginQR.vue';
   import register from "../login && regist/register";
   import resetPassword from "../login && regist/resetPassword";
   export default {
@@ -93,7 +99,8 @@
     components: {
       login,
       register,
-      resetPassword
+      resetPassword,
+      loginQRVue
     },
     mounted () {
 
@@ -216,7 +223,13 @@
      border-bottom: 2px solid transparent;
      color: #909399;
   }
-
+  .loginDialog {
+    text-align: left;
+  }
+  .dialogTitle {
+    font-size: 20px;
+    padding-left: 10px;
+  }
 </style>
 <style>
   .mu-dialog{

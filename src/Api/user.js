@@ -1,5 +1,12 @@
 import Api from "../plugins/axios";
 
+
+// 游客登陆(速度较慢)
+export function anonimous() {
+  return Api.get("/register/anonimous")
+}
+
+// 验证码登陆
 export function login(data) {
   return Api({
     url: "/login/cellphone",
@@ -10,6 +17,22 @@ export function login(data) {
     }
   })
 }
+
+// 生成二维码key
+export function getQrKey() {
+  return Api.get("/login/qr/key?timestamp=" + Date.now())
+}
+
+// 生成二维码
+export function createQr(key, qrimg = true) {
+  return Api.get("/login/qr/create?key=" + key + "&qrimg=" + qrimg + "&timestamp=" + Date.now())
+}
+
+// 检测扫码状态
+export function checkScan(key) {
+  return Api.get("/login/qr/check?key=" + key + "&timestamp=" + Date.now())
+}
+
 export function loginStatus() {
   return Api({
     url: "/login/status",

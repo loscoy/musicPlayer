@@ -33,6 +33,9 @@ Vue.use(AtComponents)
 
 Vue.prototype.$axios = Axios
 Vue.prototype.$ = $
+Vue.prototype.$setCookie = setCookie
+Vue.prototype.$getCookie = getCookie
+Vue.prototype.$delCookie = delCookie
 Vue.config.productionTip = false
 
 /* eslint-disable no-new */
@@ -44,3 +47,26 @@ new Vue({
   template: '<App/>',
 
 })
+
+// 设置cookie
+function setCookie(name, value, day) {
+  let date = new Date()
+  date.setDate(date.getDate() + day)
+  document.cookie = name + '=' + value + ';expires=' + date
+}
+
+// 获取cookie
+function getCookie(name) {
+  let reg = RegExp(name + '=([^;]+)')
+  let arr = document.cookie.match(reg)
+  if (arr) {
+    return arr[1]
+  } else {
+    return ''
+  }
+}
+
+// 删除cookie
+function delCookie(name) {
+  setCookie(name, nill, -1)
+}
