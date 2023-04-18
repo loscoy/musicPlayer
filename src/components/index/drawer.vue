@@ -42,8 +42,9 @@
 </template>
 
 <script>
-  import { getUserInfo, logOut } from "../../Api/user";
+  import { logOut } from "../../Api/user";
   import setting from "./slider/setting";
+  import { mapState } from 'vuex'
 
   export default {
     name: "slider",
@@ -62,7 +63,7 @@
       setting
     },
     computed: {
-
+      ...mapState(['user'])
     },
     watch: {
       open (val) {
@@ -81,14 +82,15 @@
         this.openS= true
       },
       logout () {
-        let that = this
-        if (localStorage.getItem('token') !== null) {
+        let _this = this
+        if (_this.user.id !== null) {
           logOut().then(res => {
             console.log(res);
+            location.reload()
           });
-          this.$store.dispatch("clearUser")
+          _this.$store.dispatch("clearUser")
         } else {
-          this.$toast.info("未登录");
+          _this.$toast.info("未登录");
         }
       },
     }
