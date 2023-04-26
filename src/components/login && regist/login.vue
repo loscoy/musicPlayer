@@ -86,10 +86,10 @@
         };
       },
       toRegister(){
-        this.$emit('change', "register","注册","暂不注册")
+        this.$emit('change', "register","注册")
       },
       toResetPass(){
-        this.$emit('change','resetPassword','重置密码','关闭')
+        this.$emit('change','resetPassword','重置密码')
       }
     },
   };

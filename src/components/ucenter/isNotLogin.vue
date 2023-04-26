@@ -22,9 +22,11 @@
               立即登录<i class="el-icon-arrow-right"></i>
             </div>
 
-            <el-dialog :visible.sync="openAlert" width="90%" class="loginDialog">
-              <div class="dialogTitle">{{title}}</div>
-              <div @click="changeComp('loginQRVue', '二维码登陆', '')">二维码登陆</div>
+            <el-dialog :visible.sync="openAlert" :destroy-on-close="true" width="90%" class="loginDialog">
+              <div class="dialogTop">
+                <div class="dialogTitle">{{title}}</div>
+                <div @click="changeComp(comp != 'loginQRVue' ? 'loginQRVue' : 'login', '二维码登陆')">{{ comp != 'loginQRVue' ? '二维码登陆' : '手机号登陆'}}</div>
+              </div>
               <component @change="changeComp" @closeAlert="closeAlertDialog" :is="comp"></component>
             </el-dialog>
             <!-- <mu-dialog :title="title" width="600" max-width="90%" style="border-radius:10px"
@@ -93,7 +95,6 @@
         openAlert: false,
         title: "登录",
         comp: "login",
-        actions: "暂不登录",
       };
     },
     components: {
@@ -115,10 +116,9 @@
       handleSelect (key, keyPath) {
         console.log(key, keyPath);
       },
-      changeComp(component,title,actions){
+      changeComp(component,title){
         this.comp = component
         this.title = title
-        this.actions = actions
       }
     }
   };
@@ -225,6 +225,11 @@
   }
   .loginDialog {
     text-align: left;
+  }
+  .dialogTop {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
   }
   .dialogTitle {
     font-size: 20px;
