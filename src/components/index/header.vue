@@ -23,7 +23,7 @@ import Vue from "vue"
 import { getUserInfo } from "../../Api/user";
 const LRC = Vue.component("lrc", (resolve) => require(["../../components/LRC"], resolve));
 export default {
-  name: "header",
+  name: "customHeader",
   data () {
     return {
       open: false,
@@ -40,14 +40,16 @@ export default {
     },
   },
   mounted () {
-    getUserInfo(this.uid).then(res => {
-      this.userInfo = {
-        avatarUrl: res.data.profile.avatarUrl,
-        signature: res.data.profile.signature,
-        nickname: res.data.profile.nickname,
-        bgUrl: res.data.profile.backgroundUrl
-      }
-    })
+    if (this.uid) {
+      getUserInfo(this.uid).then(res => {
+        this.userInfo = {
+          avatarUrl: res.data.profile.avatarUrl,
+          signature: res.data.profile.signature,
+          nickname: res.data.profile.nickname,
+          bgUrl: res.data.profile.backgroundUrl
+        }
+      })
+    }
   },
   methods: {
     open1 (val) {

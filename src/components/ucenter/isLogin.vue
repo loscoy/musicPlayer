@@ -91,6 +91,9 @@
 		},
 		methods: {
 			getInfo() {
+				if (!this.uid) {
+					return
+				}
 				getUserInfo(this.uid).then(res => {
 					this.userInfo = {
 						avatarUrl: res.data.profile.avatarUrl,

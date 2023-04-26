@@ -35,7 +35,7 @@
 <script>
 	import { mapActions } from 'vuex'
 	export default {
-		name: 'footer',
+		name: 'customFooter',
 		methods: {
 			...mapActions(['showMusicplay']),
 			show() {

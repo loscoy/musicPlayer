@@ -92,6 +92,9 @@
           this.loading = false
         },500)
       })
+      if (!this.uid) {
+        return
+      }
       getUserInfo(this.uid).then(res => {
         this.user = {
           avatar:res.data.profile.avatarUrl,

@@ -42,7 +42,7 @@
 </template>
 
 <script>
-  import { getUserInfo, logOut } from "../../Api/user";
+  import { logOut } from "../../Api/user";
   import setting from "./slider/setting";
 
   export default {

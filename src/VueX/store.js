@@ -7,6 +7,7 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     user: {
+      cookie: "",
       token: "",
       id: "",
     },
@@ -51,10 +52,12 @@ export default new Vuex.Store({
     SET_USER: (state, data) => {
       state.user.token = data.token
       state.user.id = data.id
+      state.user.cookie = data.cookie
     },
     CLEAR_USER: (state) => {
       state.user.token = ''
       state.user.id = ''
+      state.user.cookie = ''
     },
     HIND_MUSICPLAY: (state) => {
       state.musicPlayShow = 0

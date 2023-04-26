@@ -33,6 +33,8 @@ Vue.use(AtComponents)
 
 Vue.prototype.$axios = Axios
 Vue.prototype.$ = $
+Vue.prototype.$debounce = debounce
+Vue.prototype.$throltter = throltter
 Vue.prototype.$setCookie = setCookie
 Vue.prototype.$getCookie = getCookie
 Vue.prototype.$delCookie = delCookie
@@ -69,4 +71,36 @@ function getCookie(name) {
 // 删除cookie
 function delCookie(name) {
   setCookie(name, nill, -1)
+}
+
+// 防抖
+
+function debounce(func, delay) {
+  let timer = null
+
+  return function () {
+    if (timer) clearTimeout(timer)
+
+    let context = this
+    let args = arguments
+
+    timer = setTimeout(() => {
+      func.apply(context, args)
+    }, delay);
+  }
+}
+
+function throltter(func, delay) {
+  let timer = null
+
+  return function() {
+    if (timer) return
+
+    let context = this
+    let args = arguments
+
+    timer = setTimeout(() => {
+      func.apply(context, args)
+    }, delay);
+  }
 }

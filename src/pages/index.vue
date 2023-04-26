@@ -2,13 +2,13 @@
 	<div class="index">
 		<el-container v-show="!musicPlayShow">
 			<el-header class="index-header">
-				<Header></Header>
+				<CustomHeader></CustomHeader>
 			</el-header>
 			<div class="main">
 				<router-view />
 			</div>
-			<div ref="footer" class="index-footer">
-				<Footer></Footer>
+			<div ref="customFooter" class="index-footer">
+				<CustomFooter></CustomFooter>
 			</div>
 		</el-container>
 		<mu-scale-transition>
@@ -18,8 +18,8 @@
 </template>
 
 <script>
-import Header from '../components/index/header'
-import Footer from '../components/index/footer'
+import CustomHeader from '../components/index/header'
+import CustomFooter from '../components/index/footer'
 import musicplay from '../pages/musicPlay2'
 import { mapState } from 'vuex'
 export default {
@@ -30,8 +30,8 @@ export default {
 		})
 	},
 	components: {
-		Footer,
-		Header,
+		CustomFooter,
+		CustomHeader,
 		musicplay
 	},
 	mounted () {
@@ -40,7 +40,7 @@ export default {
 	methods: {
 		onScroll () {
 			const scrollTop = document.documentElement.scrollTop + document.body.scrollTop
-			const footerDom = this.$refs.footer
+			const footerDom = this.$refs.customFooter
 			if (scrollTop >= 100) {
 				if (!footerDom.getAttribute("class").includes("no-top")) {
 					footerDom.className = 'index-footer not-top'
